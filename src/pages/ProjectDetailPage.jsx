@@ -5,6 +5,7 @@
 import { useParams, Link } from 'react-router-dom'
 import { useLanguage } from '../context/LanguageContext'
 import profile from '../data/profile'
+import { assetUrl } from '../constants'
 
 export default function ProjectDetailPage() {
   const { id } = useParams()
@@ -48,7 +49,7 @@ export default function ProjectDetailPage() {
 
         <div className="space-y-4 mb-8">
           {images.map((src, i) => (
-            <img key={i} src={src} alt={`${project.title} ${i + 1}`} className="w-full rounded-xl border border-slate-200 dark:border-slate-700" />
+            <img key={i} src={assetUrl(src)} alt={`${project.title} ${i + 1}`} className="w-full rounded-xl border border-slate-200 dark:border-slate-700" />
           ))}
         </div>
       </div>

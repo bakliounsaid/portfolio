@@ -12,6 +12,7 @@ Portfolio personnel développeur web, présentant le parcours, les projets et le
 - **Chat interactif** : bulle flottante pour poser des questions libres sur le parcours, les projets, les compétences, le contact ; réponses basées sur les données du profil, avec relances et suggestions
 - **Détail des projets** : page dédiée pour chaque projet (`/project/:id`) avec description complète et technologies
 - **Formulaire de contact** : envoi via [Formspree](https://formspree.io) (configurable via variable d'environnement)
+- **PWA** : installable comme application de bureau (Chrome, Edge, etc.) et sur mobile ; cache offline via Service Worker
 - **Responsive** : adapté mobile, tablette et desktop
 
 ---
@@ -25,6 +26,7 @@ Portfolio personnel développeur web, présentant le parcours, les projets et le
 | **React Router** | Routes (accueil, détail projet) |
 | **Tailwind CSS** | Styles, mode sombre (class) |
 | **Formspree** | Envoi du formulaire Contact (sans backend) |
+| **vite-plugin-pwa** | PWA : manifest, Service Worker (Workbox), installation bureau |
 
 ---
 
@@ -76,7 +78,8 @@ npm install
 npm run dev
 ```
 
-Ouvrir `http://localhost:5173` (ou l’URL affichée par Vite).
+- **Si `base` = `'/'`** (défaut) : ouvrir **`http://localhost:5173/`**
+- **Si `base` = `'/portfolio/'`** (sous-dossier, ex. GitHub Pages) : ouvrir **`http://localhost:5173/portfolio/`**
 
 ---
 
@@ -86,6 +89,15 @@ Ouvrir `http://localhost:5173` (ou l’URL affichée par Vite).
 npm run build    # → dist/
 npm run preview  # Serve la version buildée en local
 ```
+
+### PWA — Installation comme application
+
+Après `npm run build` et déploiement (ou `npm run preview` en HTTPS), le site est **installable** :
+
+- **Desktop** : Chrome, Edge → icône « Installer l’application » / « Install app » dans la barre d’adresse ou le menu.
+- **Mobile** : « Ajouter à l’écran d’accueil » (iOS) ou « Installer l’application » (Android).
+
+Le Service Worker met en cache les assets pour une utilisation **hors ligne** ; les mises à jour sont appliquées automatiquement (`registerType: 'autoUpdate'`).
 
 ---
 
@@ -101,6 +113,15 @@ VITE_FORMSPREE_ID=votre_id_formspree
 ```
 
 Sans `VITE_FORMSPREE_ID`, le formulaire utilise une valeur par défaut (à remplacer pour la prod).
+
+### Base URL (sous-dossier)
+
+Dans `vite.config.js`, l’option **`base`** définit le chemin de l’app :
+
+- `base: '/'` → l’app est à la racine (`/`) ; en dev : `http://localhost:5173/`
+- `base: '/portfolio/'` → l’app est dans le sous-dossier `/portfolio/` ; en dev : `http://localhost:5173/portfolio/` (utile pour GitHub Pages ou un hébergement en sous-dossier)
+
+`BrowserRouter` utilise `import.meta.env.BASE_URL` pour le `basename`, donc les routes restent correctes. Si vous ne voyez que le header et le footer, vérifier que l’URL (et `base`) correspondent.
 
 ### Personnalisation des données
 

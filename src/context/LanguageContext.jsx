@@ -19,9 +19,9 @@ export function LanguageProvider({ children }) {
     try {
       const v = localStorage.getItem('portfolio-dark')
       if (v !== null) return v === 'true'
-      return window.matchMedia('(prefers-color-scheme: dark)').matches
+      return true // par défaut : mode sombre
     } catch {
-      return false
+      return true
     }
   })
 

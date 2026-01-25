@@ -7,6 +7,7 @@ import Section from '../components/Section'
 import Card from '../components/Card'
 import { useLanguage } from '../context/LanguageContext'
 import profile from '../data/profile'
+import { assetUrl } from '../constants'
 
 export default function Projects() {
   const { t } = useLanguage()
@@ -18,7 +19,7 @@ export default function Projects() {
           const pt = t.projects?.[p.id]
           return (
           <Card key={p.id} className="overflow-hidden">
-            <img src={p.image} alt={pt?.title || p.title} className="w-full h-44 object-cover" />
+            <img src={assetUrl(p.image)} alt={pt?.title || p.title} className="w-full h-44 object-cover" />
             <div className="p-4">
               <h3 className="font-semibold text-slate-800 dark:text-white mb-2">{pt?.title || p.title}</h3>
               <p className="text-sm text-slate-600 dark:text-slate-400 mb-2 line-clamp-2">{pt?.description || p.description}</p>
