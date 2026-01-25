@@ -156,7 +156,7 @@ export default function Contact({ data }) {
       {/* Snackbar */}
       {snackbar && (
         <div
-          className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] px-4 py-3 rounded-lg shadow-lg text-white text-sm font-medium flex items-center gap-2 animate-in fade-in duration-300 ${
+          className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] px-4 py-3 rounded-lg shadow-lg text-white text-sm font-medium flex items-center gap-2 ${
             snackbar === 'success'
               ? 'bg-emerald-600 dark:bg-emerald-500'
               : 'bg-red-600 dark:bg-red-500'
