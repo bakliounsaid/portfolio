@@ -18,7 +18,7 @@ export default function ProjectDetailPage() {
       <div className="min-h-screen bg-white dark:bg-black flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-slate-800 dark:text-white mb-4">{pd.notFound || 'Projet non trouvé'}</h1>
-          <Link to="/#projects" className="text-indigo-500 hover:underline">{pd.back || '← Retour aux projets'}</Link>
+          <Link to="/#projects" className="text-black dark:text-indigo-500 hover:underline">{pd.back || '← Retour aux projets'}</Link>
         </div>
       </div>
     )
@@ -31,7 +31,7 @@ export default function ProjectDetailPage() {
   return (
     <div className="min-h-screen bg-white dark:bg-black py-8 px-4">
       <div className="max-w-3xl mx-auto">
-        <Link to="/#projects" className="text-indigo-500 hover:underline mb-6 inline-block">{pd.back || '← Retour aux projets'}</Link>
+        <Link to="/#projects" className="text-black dark:text-indigo-500 hover:underline mb-6 inline-block">{pd.back || '← Retour aux projets'}</Link>
         <h1 className="text-3xl font-bold text-slate-800 dark:text-white mb-2">{pt?.title || project.title}</h1>
 
         {techs.length > 0 && (

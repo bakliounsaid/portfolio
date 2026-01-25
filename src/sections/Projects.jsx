@@ -32,7 +32,7 @@ export default function Projects() {
               <div className="flex justify-end mt-2">
                 <Link
                   to={`/project/${p.id}`}
-                  className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 hover:underline font-medium text-sm inline-flex items-center gap-1"
+                  className="text-black dark:text-indigo-400 hover:text-slate-800 dark:hover:text-indigo-300 hover:underline font-medium text-sm inline-flex items-center gap-1"
                 >
                   {t.projects?.details || 'Détails'}
                   <span aria-hidden>→</span>

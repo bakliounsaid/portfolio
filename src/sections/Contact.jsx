@@ -1,14 +1,14 @@
 /**
  * Contact – formulaire (email, subject, message) envoyé via Formspree.
  * Validation des champs, erreurs affichées, snackbar de succès ou d'erreur.
- * Définir VITE_FORMSPREE_ID dans .env (créer un formulaire sur formspree.io).
+ * VITE_FORMSPREE_ID dans .env override la valeur par défaut.
  */
 
 import { useState, useEffect } from 'react'
 import Section from '../components/Section'
 import { useLanguage } from '../context/LanguageContext'
 
-const FORMSPREE_ID = import.meta.env.VITE_FORMSPREE_ID || ''
+const FORMSPREE_ID = import.meta.env.VITE_FORMSPREE_ID || 'xpqdzvaw'
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
@@ -92,7 +92,7 @@ export default function Contact({ data }) {
     <Section id="contact" title={labels.title || 'Contact'}>
       <form
         onSubmit={handleSubmit}
-        className="max-w-md mx-auto p-6 rounded-xl border-2 border-slate-300 dark:border-indigo-400/60 bg-white dark:bg-slate-800/95 shadow-md shadow-slate-200/50 dark:shadow-xl dark:shadow-black/50 space-y-4"
+        className="max-w-md mx-auto p-6 rounded-xl border-2 border-slate-300 dark:border-indigo-400/50 bg-white dark:bg-slate-900/95 shadow-md shadow-slate-200/50 dark:shadow-xl dark:shadow-black/40 space-y-4"
       >
         <div>
           <label htmlFor="email" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
@@ -146,7 +146,7 @@ export default function Contact({ data }) {
           <button
             type="submit"
             disabled={loading}
-            className="px-4 py-2 rounded-lg border-2 border-slate-800 dark:border-white bg-slate-800 text-white hover:bg-slate-700 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100 text-sm font-semibold transition-all duration-300 hover:scale-105 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
+            className="px-4 py-2 rounded-lg border-2 border-black dark:border-white bg-black text-white hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100 text-sm font-semibold transition-all duration-300 hover:scale-105 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
           >
             {loading ? (labels.sending || 'Sending...') : (labels.send || 'Send')}
           </button>

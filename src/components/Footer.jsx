@@ -32,23 +32,23 @@ export default function Footer() {
   const c = profile.contact || {}
 
   return (
-    <footer className="bg-slate-900 dark:bg-black border-t border-slate-700 dark:border-slate-800 py-6">
+    <footer className="bg-slate-100 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-6">
       <div className="max-w-5xl mx-auto px-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <nav className="flex flex-wrap items-center gap-4">
-          <a href={`tel:${c.phone}`} className="text-slate-300 hover:text-indigo-400 transition-colors flex items-center gap-1.5" aria-label={f.phone}>
+          <a href={`tel:${c.phone}`} className="text-black dark:text-slate-300 hover:text-slate-800 dark:hover:text-indigo-400 transition-colors flex items-center gap-1.5 font-medium" aria-label={f.phone}>
             <IconPhone /> {f.phone}
           </a>
-          <a href={`mailto:${c.email}`} className="text-slate-300 hover:text-indigo-400 transition-colors flex items-center gap-1.5" aria-label={f.email}>
+          <a href={`mailto:${c.email}`} className="text-black dark:text-slate-300 hover:text-slate-800 dark:hover:text-indigo-400 transition-colors flex items-center gap-1.5 font-medium" aria-label={f.email}>
             <IconEmail /> {f.email}
           </a>
-          <a href={c.linkedin} target="_blank" rel="noopener noreferrer" className="text-slate-300 hover:text-indigo-400 transition-colors flex items-center gap-1.5" aria-label="LinkedIn">
+          <a href={c.linkedin} target="_blank" rel="noopener noreferrer" className="text-black dark:text-slate-300 hover:text-slate-800 dark:hover:text-indigo-400 transition-colors flex items-center gap-1.5 font-medium" aria-label="LinkedIn">
             <IconLinkedIn /> {f.linkedin}
           </a>
-          <a href={c.github} target="_blank" rel="noopener noreferrer" className="text-slate-300 hover:text-indigo-400 transition-colors flex items-center gap-1.5" aria-label="GitHub">
+          <a href={c.github} target="_blank" rel="noopener noreferrer" className="text-black dark:text-slate-300 hover:text-slate-800 dark:hover:text-indigo-400 transition-colors flex items-center gap-1.5 font-medium" aria-label="GitHub">
             <IconGitHub /> {f.github}
           </a>
         </nav>
-        <span className="text-slate-300 text-sm sm:text-base shrink-0">{f.copyright ?? '© Baklioun ESSAID'}</span>
+        <span className="text-black dark:text-slate-300 text-sm sm:text-base shrink-0">{f.copyright ?? '© Baklioun ESSAID'}</span>
       </div>
     </footer>
   )

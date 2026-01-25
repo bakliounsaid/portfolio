@@ -6,7 +6,7 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Chat widget: icône plus visible, vibrate subtil, blanc en dark mode */
+/* ---------- Chat widget ---------- */
 @keyframes chat-vibrate {
   0%, 100% { transform: translate(0, 0); }
   20% { transform: translate(-1px, 1px); }
@@ -37,7 +37,7 @@ html {
   }
 }
 
-/* Hero : entrée (photo depuis la gauche, texte depuis la droite) et sortie au scroll */
+/* ---------- Hero ---------- */
 .hero-photo {
   opacity: 0;
   transform: translateX(-2.5rem);
@@ -68,7 +68,7 @@ html {
   transform: translateX(0);
 }
 
-/* « Hello I'm » : arrive du haut avec petite animation */
+/* Hello I'm : animation depuis le haut */
 .hero-hello-from-top {
   opacity: 0;
   transform: translateY(-1rem);
@@ -87,7 +87,7 @@ html {
   transform: translateX(2.5rem);
 }
 
-/* Bouton Contact me : blanc, petit, lueur indigo pulse + transition */
+/* ---------- Hero : bouton Contact me ---------- */
 @keyframes hero-btn-glow {
   0%, 100% {
     box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.25), 0 1px 4px rgba(0, 0, 0, 0.06);
@@ -108,7 +108,7 @@ html {
   animation: hero-btn-glow 2s ease-in-out infinite;
 }
 
-/* Bouton Contact me : vibrate (shake) sur tout le bouton */
+/* Bouton Contact me : vibrate */
 @keyframes hero-btn-vibrate {
   0%, 100% { transform: translateX(0); }
   25% { transform: translateX(-1.5px); }
@@ -116,5 +116,5 @@ html {
 }
 .hero-contact-btn-vibrate {
   display: inline-block;
-  animation: hero-btn-vibrate 0.35s ease-in-out infinite;
+  animation: hero-btn-vibrate 1.2s ease-in-out infinite;
 }
