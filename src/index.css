@@ -1,0 +1,120 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Chat widget: icône plus visible, vibrate subtil, blanc en dark mode */
+@keyframes chat-vibrate {
+  0%, 100% { transform: translate(0, 0); }
+  20% { transform: translate(-1px, 1px); }
+  40% { transform: translate(1px, -1px); }
+  60% { transform: translate(-1px, -1px); }
+  80% { transform: translate(1px, 1px); }
+}
+
+.chat-btn-vibrate {
+  animation: chat-vibrate 2.5s ease-in-out infinite;
+}
+.chat-btn-vibrate:hover {
+  animation-duration: 1.5s;
+}
+
+.chat-float {
+  animation: chat-float 0.3s ease-out;
+}
+
+@keyframes chat-float {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Hero : entrée (photo depuis la gauche, texte depuis la droite) et sortie au scroll */
+.hero-photo {
+  opacity: 0;
+  transform: translateX(-2.5rem);
+  transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1), transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Hero photo : légère vibration continue */
+@keyframes hero-photo-vibrate {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(0.5px, -0.5px); }
+  50% { transform: translate(-0.5px, 0.5px); }
+  75% { transform: translate(0.5px, 0.5px); }
+}
+.hero-photo-vibrate img {
+  animation: hero-photo-vibrate 4s ease-in-out infinite;
+}
+.hero-text {
+  opacity: 0;
+  transform: translateX(2.5rem);
+  transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.1s, transform 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.1s;
+}
+.hero-in .hero-photo {
+  opacity: 1;
+  transform: translateX(0);
+}
+.hero-in .hero-text {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* « Hello I'm » : arrive du haut avec petite animation */
+.hero-hello-from-top {
+  opacity: 0;
+  transform: translateY(-1rem);
+  transition: opacity 0.5s ease 0.2s, transform 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.2s;
+}
+.hero-in .hero-hello-from-top {
+  opacity: 1;
+  transform: translateY(0);
+}
+.hero-out .hero-photo {
+  opacity: 0;
+  transform: translateX(-2.5rem);
+}
+.hero-out .hero-text {
+  opacity: 0;
+  transform: translateX(2.5rem);
+}
+
+/* Bouton Contact me : blanc, petit, lueur indigo pulse + transition */
+@keyframes hero-btn-glow {
+  0%, 100% {
+    box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.25), 0 1px 4px rgba(0, 0, 0, 0.06);
+  }
+  50% {
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.4), 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+}
+.hero-contact-btn {
+  animation: hero-btn-glow 2.5s ease-in-out infinite;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
+}
+.hero-contact-btn:hover {
+  animation: hero-btn-glow 1.2s ease-in-out infinite;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.45), 0 2px 10px rgba(99, 102, 241, 0.12);
+}
+.hero-contact-btn:active {
+  animation: hero-btn-glow 2s ease-in-out infinite;
+}
+
+/* Bouton Contact me : vibrate (shake) sur tout le bouton */
+@keyframes hero-btn-vibrate {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-1.5px); }
+  75% { transform: translateX(1.5px); }
+}
+.hero-contact-btn-vibrate {
+  display: inline-block;
+  animation: hero-btn-vibrate 0.35s ease-in-out infinite;
+}
