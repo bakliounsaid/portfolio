@@ -146,7 +146,7 @@ export default function Contact({ data }) {
           <button
             type="submit"
             disabled={loading}
-            className="px-4 py-2 rounded-lg border-2 border-black dark:border-white bg-black text-white hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100 text-sm font-semibold transition-all duration-300 hover:scale-105 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
+            className="px-4 py-2 rounded-lg border-2 border-black dark:border-white bg-black dark:bg-white text-white dark:text-black hover:bg-slate-800 dark:hover:bg-slate-100 text-sm font-semibold transition-all duration-300 hover:scale-105 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
           >
             {loading ? (labels.sending || 'Sending...') : (labels.send || 'Send')}
           </button>

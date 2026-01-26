@@ -164,7 +164,7 @@ export default function ChatWidget() {
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="chat-btn-vibrate fixed bottom-6 right-6 z-50 w-14 h-14 rounded-2xl bg-black hover:bg-slate-800 text-white dark:bg-white dark:text-indigo-600 dark:hover:bg-slate-100 dark:border-white/80 dark:shadow-slate-200/50 dark:focus:ring-offset-slate-900 border-2 border-black dark:border-white/80 shadow-xl flex items-center justify-center transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 focus:ring-offset-white"
+        className="chat-btn-vibrate fixed bottom-6 right-6 z-50 w-14 h-14 rounded-2xl bg-black hover:bg-slate-800 text-white dark:bg-white dark:hover:bg-slate-100 dark:text-black dark:border-white/80 dark:shadow-slate-200/50 dark:focus:ring-offset-slate-900 border-2 border-black dark:border-white/80 shadow-xl flex items-center justify-center transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 focus:ring-offset-white"
         aria-label="Chat"
       >
         <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden>
@@ -269,7 +269,7 @@ export default function ChatWidget() {
             <button
               type="button"
               onClick={handleSend}
-              className="px-4 py-2.5 rounded-xl bg-black hover:bg-slate-800 dark:bg-indigo-600 dark:hover:bg-indigo-500 text-white text-sm font-medium transition-colors"
+              className="px-4 py-2.5 rounded-xl bg-black hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-black text-sm font-medium transition-colors"
             >
               {c.send || 'Send'}
             </button>

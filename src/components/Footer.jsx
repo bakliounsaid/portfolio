@@ -48,7 +48,7 @@ export default function Footer() {
             <IconGitHub /> {f.github}
           </a>
         </nav>
-        <span className="text-black dark:text-slate-300 text-sm sm:text-base shrink-0">{f.copyright ?? '© Baklioun ESSAID'}</span>
+        <span className="text-black dark:text-slate-300 text-sm sm:text-base shrink-0 text-right" dir="ltr">{f.copyright ?? '© Baklioun ESSAID'}</span>
       </div>
     </footer>
   )
