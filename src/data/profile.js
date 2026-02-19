@@ -7,10 +7,10 @@ export default {
   hero: {
     name: 'Baklioun ESSAID',
     role: 'Développeur Web',
-    tagline: 'Software Engineer combining analytical thinking and a strong mathematical mindset to turn complex problems into scalable solutions that reduce costs, improve performance, and deliver measurable business value.',
+    tagline: 'I am a web developer with a mathematical vision. I design performant and scalable solutions to help you reduce costs and improve performance.',
   },
   about: {
-    summary: 'Software Engineer and Backend Web Developer with a strong analytical and mathematical mindset. Experienced in building scalable, efficient, and maintainable web applications using modern backend technologies. Skilled in API development, database design, and system architecture, with a focus on delivering high-impact solutions that improve performance, reduce costs, and create real business value. Proficient in AI-assisted development to accelerate delivery while maintaining code quality and reliability.',
+    summary: 'I am a software engineer and web developer with a mathematical and analytical vision. I model your complex problems, develop APIs and scalable systems using Laravel, PHP, and optimized databases. If you are seeking reliable, performant, and cost-effective solutions built with rigor and optimization, I can help you transform your technical challenges into competitive advantages.',
     highlights: [],
   },
   contact: {
@@ -19,7 +19,7 @@ export default {
     location: 'Paris',
     linkedin: 'https://www.linkedin.com/in/baklioun-essaid',
     github: 'https://github.com/baklioun-essaid',
-    cv: 'https://drive.google.com/file/d/1w2ZsGJageqwimhxGTCn06nEt26eoUitJ/view?usp=sharing',
+    cv: 'https://drive.google.com/file/d/1hnoosqLNq5oDRPSoAfckuw-bFpYUfyf5/view?usp=sharing',
   },
   skills: {
     backend: ['Laravel', 'CodeIgniter', 'PHP', 'API REST', 'Livewire'],

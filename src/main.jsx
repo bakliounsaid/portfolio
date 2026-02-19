@@ -11,7 +11,8 @@ registerSW()
 
 // basename : si l'app est servie dans un sous-dossier (ex. /portfolio/), doit correspondre à vite base.
 // import.meta.env.BASE_URL = '/' en dev avec base: '/' ; = '/portfolio/' si base: '/portfolio/'
-const basename = import.meta.env.BASE_URL === '/' ? '' : import.meta.env.BASE_URL.replace(/\/$/, '')
+const baseUrl = import.meta.env.BASE_URL || '/'
+const basename = baseUrl === '/' ? '' : baseUrl.replace(/\/$/, '')
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

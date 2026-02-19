@@ -20,12 +20,12 @@ export const translations = {
       hello: 'Bonjour, je suis',
       role: 'Développeur Web',
       contactMe: 'Contactez-moi',
-      tagline: 'Ingénieur logiciel alliant rigueur analytique et esprit mathématique pour transformer des problèmes complexes en solutions évolutives qui réduisent les coûts, améliorent les performances et délivrent une valeur business mesurable.',
+      tagline: 'Je suis développeur web avec une vision mathématique. Je conçois des solutions performantes et évolutives pour vous aider à réduire vos coûts et améliorer vos performances.',
     },
     about: {
       title: 'À propos',
-      summary: 'Ingénieur logiciel et Développeur Web Backend avec un esprit analytique et mathématique marqué. Expérimenté dans la conception d\'applications web évolutives, efficaces et maintenables avec les technologies backend modernes. Compétent en développement d\'API, conception de bases de données et architecture système, avec un objectif de solutions à fort impact qui améliorent les performances, réduisent les coûts et créent une valeur business réelle. Maîtrise du développement assisté par l\'IA pour accélérer la livraison tout en maintenant qualité et fiabilité du code.',
-      highlight: 'Développeur Web Backend',
+      summary: 'Je suis ingénieur logiciel et développeur web avec une vision mathématique et analytique. Je modélise vos problèmes complexes, développe des API et des systèmes évolutifs avec Laravel, PHP et des bases de données optimisées. Si vous cherchez des solutions fiables, performantes et rentables, pensées avec rigueur et optimisation, je peux vous aider à transformer vos défis techniques en avantages compétitifs.',
+      highlight: 'Développeur Web – Vision mathématique',
     },
     skills: {
       title: 'Compétences',
@@ -158,12 +158,12 @@ export const translations = {
       hello: 'Hello, I\'m',
       role: 'Web Developer',
       contactMe: 'Contact me',
-      tagline: 'Software Engineer combining analytical thinking and a strong mathematical mindset to turn complex problems into scalable solutions that reduce costs, improve performance, and deliver measurable business value.',
+      tagline: 'Web developer with a mathematical vision: I design performant and scalable solutions for businesses looking to reduce costs and improve performance.',
     },
     about: {
       title: 'About',
-      summary: 'Software Engineer and Backend Web Developer with a strong analytical and mathematical mindset. Experienced in building scalable, efficient, and maintainable web applications using modern backend technologies. Skilled in API development, database design, and system architecture, with a focus on delivering high-impact solutions that improve performance, reduce costs, and create real business value. Proficient in AI-assisted development to accelerate delivery while maintaining code quality and reliability.',
-      highlight: 'Backend Web Developer',
+      summary: 'Who: Software engineer and web developer with a mathematical and analytical vision. What: I model complex problems, develop APIs and scalable systems (Laravel, PHP, databases). For whom: For businesses seeking reliable, performant, and cost-effective solutions, built with rigor and optimization.',
+      highlight: 'Web Developer – Mathematical vision',
     },
     skills: {
       title: 'Skills',
