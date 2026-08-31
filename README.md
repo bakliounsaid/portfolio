@@ -1,131 +1,96 @@
 # Portfolio — Baklioun ESSAID
 
-Portfolio personnel développeur web, présentant le parcours, les projets et les compétences de **Baklioun ESSAID** (Ingénieur logiciel & Développeur Web Backend).
+Personal developer portfolio presenting the background, projects and skills of **Baklioun ESSAID** (Software Engineer & Backend Web Developer).
 
 ---
 
-## Fonctionnalités
+## Features
 
-- **Sections** : Hero, À propos, Projets, Compétences, Formation, Expérience, Centres d'intérêt, Contact
-- **Bilingue** : Français / Anglais (sélecteur dans la barre de navigation)
-- **Mode clair / sombre** : bascule dans le header, préférence mémorisée
-- **Chat interactif** : bulle flottante pour poser des questions libres sur le parcours, les projets, les compétences, le contact ; réponses basées sur les données du profil, avec relances et suggestions
-- **Détail des projets** : page dédiée pour chaque projet (`/project/:id`) avec description complète et technologies
-- **Formulaire de contact** : envoi via [Formspree](https://formspree.io) (configurable via variable d'environnement)
-- **PWA** : installable comme application de bureau (Chrome, Edge, etc.) et sur mobile ; cache offline via Service Worker
-- **Responsive** : adapté mobile, tablette et desktop
+- **Sections:** Hero, About, Projects, Skills, Education, Experience, Interests, Contact
+- **Bilingual:** French / English (switcher in the navigation bar)
+- **Light / dark mode:** toggle in the header, preference remembered
+- **Interactive chat:** floating widget to ask free-form questions about background, projects, skills and contact info; answers based on profile data, with follow-up prompts and suggestions
+- **Project detail pages:** dedicated page for each project (`/project/:id`) with full description and technologies used
+- **Contact form:** submissions handled via [Formspree](https://formspree.io) (configurable through an environment variable)
+- **PWA:** installable as a desktop app (Chrome, Edge, etc.) and on mobile; offline caching via Service Worker
+- **Responsive:** adapted for mobile, tablet and desktop
 
 ---
 
-## Stack technique
+## Tech Stack
 
-| Outil | Usage |
-|-------|--------|
+| Tool | Purpose |
+|------|---------|
 | **React 18** | UI |
-| **Vite** | Build & dev |
-| **React Router** | Routes (accueil, détail projet) |
-| **Tailwind CSS** | Styles, mode sombre (class) |
-| **Formspree** | Envoi du formulaire Contact (sans backend) |
-| **vite-plugin-pwa** | PWA : manifest, Service Worker (Workbox), installation bureau |
+| **Vite** | Build & dev server |
+| **React Router** | Routing (home, project detail) |
+| **Tailwind CSS** | Styling, dark mode (class-based) |
+| **Formspree** | Contact form submission (backend-free) |
+| **vite-plugin-pwa** | PWA: manifest, Service Worker (Workbox), desktop install |
 
 ---
 
-## Structure du projet
-
-```
-src/
-├── App.jsx              # Routes, layout (Header, Footer, ChatWidget), sections
-├── main.jsx            # Point d’entrée, LanguageProvider, BrowserRouter
-├── index.css            # Tailwind + animations (Hero, Chat)
-├── constants.js         # Constantes partagées (ex. chemin avatar)
-├── components/          # Réutilisables
-│   ├── Header.jsx      # Nav, ancres, FR/EN, thème, menu mobile
-│   ├── Footer.jsx      # Liens contact (tél, email, LinkedIn, GitHub), copyright
-│   ├── ChatWidget.jsx   # Chat type discussion (contexte, relances)
-│   ├── Section.jsx     # Conteneur de section avec titre
-│   ├── Card.jsx        # Carte (projets, compétences, etc.)
-│   └── Typewriter.jsx  # Animation machine à écrire (Hero)
-├── context/
-│   └── LanguageContext.jsx   # Langue (fr/en) + thème (clair/sombre)
-├── data/
-│   ├── profile.js      # Données CV (hero, about, contact, skills, experience, projects, education, interests, languages)
-│   └── translations.js # Textes FR/EN (nav, sections, chat, footer, etc.)
-├── pages/
-│   └── ProjectDetailPage.jsx  # Détail d’un projet
-└── sections/           # Blocs de la page d’accueil
-    ├── Hero.jsx
-    ├── About.jsx
-    ├── Projects.jsx
-    ├── Skills.jsx
-    ├── Education.jsx
-    ├── Experience.jsx
-    ├── Interests.jsx
-    └── Contact.jsx
-```
-
----
-
-## Installation et démarrage
+## Getting Started
 
 ```bash
-# Cloner (ou déjà dans le dossier du projet)
+# Clone (or you're already in the project folder)
 cd portfolio
 
-# Installer les dépendances
+# Install dependencies
 npm install
 
-# Lancer en développement
+# Run in development
 npm run dev
 ```
 
-- **Si `base` = `'/'`** (défaut) : ouvrir **`http://localhost:5173/`**
-- **Si `base` = `'/portfolio/'`** (sous-dossier, ex. GitHub Pages) : ouvrir **`http://localhost:5173/portfolio/`**
+- **If `base` = `'/'`** (default): open **`http://localhost:5173/`**
+- **If `base` = `'/portfolio/'`** (subfolder, e.g. GitHub Pages): open **`http://localhost:5173/portfolio/`**
 
 ---
 
-## Build & prévisualisation
+## Build & Preview
 
 ```bash
 npm run build    # → dist/
-npm run preview  # Serve la version buildée en local
+npm run preview  # Serves the built version locally
 ```
 
-### PWA — Installation comme application
+### PWA — Installing as an app
 
-Après `npm run build` et déploiement (ou `npm run preview` en HTTPS), le site est **installable** :
+After `npm run build` and deployment (or `npm run preview` over HTTPS), the site is **installable**:
 
-- **Desktop** : Chrome, Edge → icône « Installer l’application » / « Install app » dans la barre d’adresse ou le menu.
-- **Mobile** : « Ajouter à l’écran d’accueil » (iOS) ou « Installer l’application » (Android).
+- **Desktop:** Chrome, Edge → "Install app" icon in the address bar or menu
+- **Mobile:** "Add to Home Screen" (iOS) or "Install app" (Android)
 
-Le Service Worker met en cache les assets pour une utilisation **hors ligne** ; les mises à jour sont appliquées automatiquement (`registerType: 'autoUpdate'`).
+The Service Worker caches assets for **offline use**; updates are applied automatically (`registerType: 'autoUpdate'`).
 
 ---
 
 ## Configuration
 
-### Formulaire de contact (Formspree)
+### Contact form (Formspree)
 
-1. Créer un formulaire sur [Formspree](https://formspree.io).
-2. Copier `.env.example` vers `.env` et renseigner l’identifiant :
+1. Create a form on [Formspree](https://formspree.io)
+2. Copy `.env.example` to `.env` and set the form ID:
 
 ```env
-VITE_FORMSPREE_ID=votre_id_formspree
+VITE_FORMSPREE_ID=your_formspree_id
 ```
 
-Sans `VITE_FORMSPREE_ID`, le formulaire utilise une valeur par défaut (à remplacer pour la prod).
+Without `VITE_FORMSPREE_ID`, the form falls back to a default value (replace before deploying to production).
 
-### Base URL (sous-dossier)
+### Base URL (subfolder deployment)
 
-Dans `vite.config.js`, l’option **`base`** définit le chemin de l’app :
+In `vite.config.js`, the **`base`** option defines the app's path:
 
-- `base: '/'` → l’app est à la racine (`/`) ; en dev : `http://localhost:5173/`
-- `base: '/portfolio/'` → l’app est dans le sous-dossier `/portfolio/` ; en dev : `http://localhost:5173/portfolio/` (utile pour GitHub Pages ou un hébergement en sous-dossier)
+- `base: '/'` → the app is served at the root (`/`); in dev: `http://localhost:5173/`
+- `base: '/portfolio/'` → the app is served under `/portfolio/`; in dev: `http://localhost:5173/portfolio/` (useful for GitHub Pages or subfolder hosting)
 
-`BrowserRouter` utilise `import.meta.env.BASE_URL` pour le `basename`, donc les routes restent correctes. Si vous ne voyez que le header et le footer, vérifier que l’URL (et `base`) correspondent.
+`BrowserRouter` uses `import.meta.env.BASE_URL` as its `basename`, so routes stay correct. If you only see the header and footer, check that the URL (and `base`) match.
 
-### Personnalisation des données
+### Customizing data
 
-- **Contenu affiché** : modifier `src/data/profile.js` (hero, about, contact, skills, experience, projects, education, interests, languages).
+- **Displayed content:** edit `src/data/profile.js` (hero, about, contact, skills, experience, projects, education, interests, languages)
 - **Textes et libellés** : `src/data/translations.js` (FR et EN).
 
 ---
