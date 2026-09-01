@@ -75,12 +75,12 @@ export default function ChatWidget() {
         const p = profile.projects.find((x) => /football|club/i.test(x.title))
         return { reply: p ? `${p.title}: ${p.fullDescription || p.description}` : all, topic: 'projects' }
       }
-      if (/\b(livraison|delivery)\b/.test(lower)) {
-        const p = profile.projects.find((x) => /livraison|delivery/i.test(x.title))
+      if (/\b(nft|oeuvre|art|mint|landing)\b/.test(lower)) {
+        const p = profile.projects.find((x) => /nft/i.test(x.title))
         return { reply: p ? `${p.title}: ${p.fullDescription || p.description}` : all, topic: 'projects' }
       }
-      if (/\b(alluqat|perdu|trouv|lost|found)\b/.test(lower)) {
-        const p = profile.projects.find((x) => /alluqat/i.test(x.title))
+      if (/\b(correxia|correction|ocr|examen|exam)\b/.test(lower)) {
+        const p = profile.projects.find((x) => /correxia/i.test(x.title))
         return { reply: p ? `${p.title}: ${p.fullDescription || p.description}` : all, topic: 'projects' }
       }
       return { reply: all, topic: 'projects' }
