@@ -19,7 +19,7 @@ export default {
     location: 'Paris',
     linkedin: 'https://www.linkedin.com/in/baklioun-essaid',
     github: 'https://github.com/baklioun-essaid',
-    cv: 'https://drive.google.com/file/d/1bwxwhTHEzcawU5g73jAyGizSvDaGANyC/view?usp=drive_link',
+    cv: 'https://drive.google.com/file/d/10jK45sjSSs2P6OfA2cJ-KmvZl_5L9szC/view?usp=drive_link',
   },
   skills: {
     backend: ['Java', 'Spring Boot', 'Laravel', 'CodeIgniter', 'PHP', 'API REST', 'Livewire'],
