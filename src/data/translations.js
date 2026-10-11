@@ -30,10 +30,12 @@ export const translations = {
     skills: {
       title: 'Compétences',
       backend: 'Backend',
+      frontend: 'Frontend',
       databases: 'Bases de données',
       tools: 'Outils',
       ai: 'IA & LLMs',
-      backendItems: ['Java', 'Spring Boot', 'Laravel', 'CodeIgniter', 'PHP', 'API REST', 'Livewire'],
+      backendItems: ['Java', 'Spring Boot', 'Python', 'FastAPI', 'Laravel', 'CodeIgniter', 'PHP', 'API REST'],
+      frontendItems: ['JavaScript', 'Vue.js', 'Livewire'],
       databasesItems: ['MySQL', 'PostgreSQL', 'SQLite'],
       toolsItems: ['Git', 'Docker', 'Déploiement & maintenance', 'Sécurité & performance'],
       aiItems: ['LLMs', 'Outils d\'IA pour la conception et l\'optimisation'],
@@ -77,9 +79,12 @@ export const translations = {
     },
     education: {
       title: 'Formation',
+      current: 'En cours',
       entries: [
-        { title: '4e Année Programme Grande École', school: 'Hetic', period: 'Depuis octobre 2025', location: 'France' },
-        { title: 'Mastère en Génie Logiciel', school: 'Université de Boumerdès', period: '2015 – 2019', location: 'Algérie' },
+        { title: 'Programme Grande École – 5e année', school: 'HETIC', period: '2026 – 2027', location: 'France', detail: 'Développement web, architecture logicielle et gestion de projet, en alternance (2 sem. entreprise / 1 sem. formation).', current: true },
+        { title: 'Programme Grande École – 4e année', school: 'HETIC', period: '2025 – 2026', location: 'France', detail: 'Développement web fullstack et projets en équipe.' },
+        { title: 'Master en Ingénierie du Logiciel et Traitement de l\'Information', school: 'Université de Boumerdès', period: '2017 – 2019', location: 'Algérie', detail: 'Génie logiciel, conception de systèmes d\'information et traitement de données.' },
+        { title: 'Licence en Systèmes d\'Information', school: 'Université de Boumerdès', period: '2015 – 2017', location: 'Algérie', detail: 'Bases de l\'informatique, bases de données et programmation.' },
       ],
     },
     interests: {
@@ -125,6 +130,8 @@ export const translations = {
       suggestPrompt: 'Vous pouvez me demander : expérience, projets, compétences, contact, formation, centres d\'intérêt ou langues.',
       whichProject: 'Je peux détailler un projet : Correxia, NFT Landing, Application rideaux, Football Club. Dites lequel vous intéresse.',
       alsoAsk: 'Vous pouvez aussi me demander mes projets ou compétences.',
+      location: 'Basé à Paris. Expérience en Algérie et en France.',
+      languages: 'Arabe, Anglais, Français',
       followUps: {
         moreProject: 'En savoir plus (rideaux)',
         experience: 'Mon expérience',
@@ -168,10 +175,12 @@ export const translations = {
     skills: {
       title: 'Skills',
       backend: 'Backend',
+      frontend: 'Frontend',
       databases: 'Databases',
       tools: 'Tools',
       ai: 'AI & LLMs',
-      backendItems: ['Java', 'Spring Boot', 'Laravel', 'CodeIgniter', 'PHP', 'API REST', 'Livewire'],
+      backendItems: ['Java', 'Spring Boot', 'Python', 'FastAPI', 'Laravel', 'CodeIgniter', 'PHP', 'API REST'],
+      frontendItems: ['JavaScript', 'Vue.js', 'Livewire'],
       databasesItems: ['MySQL', 'PostgreSQL', 'SQLite'],
       toolsItems: ['Git', 'Docker', 'Deployment & maintenance', 'Security & performance'],
       aiItems: ['LLMs', 'AI tools for design and optimization'],
@@ -195,9 +204,12 @@ export const translations = {
     },
     education: {
       title: 'Education',
+      current: 'In progress',
       entries: [
-        { title: '4th Year Grande École Program', school: 'Hetic', period: 'Since October 2025', location: 'France' },
-        { title: 'Master\'s in Software Engineering', school: 'University of Boumerdès', period: '2015 – 2019', location: 'Algeria' },
+        { title: 'Grande École Program – 5th year', school: 'HETIC', period: '2026 – 2027', location: 'France', detail: 'Web development, software architecture and project management, work-study (2 weeks company / 1 week school).', current: true },
+        { title: 'Grande École Program – 4th year', school: 'HETIC', period: '2025 – 2026', location: 'France', detail: 'Fullstack web development and team projects.' },
+        { title: 'Master\'s in Software Engineering and Information Processing', school: 'University of Boumerdès', period: '2017 – 2019', location: 'Algeria', detail: 'Software engineering, information systems design and data processing.' },
+        { title: 'Bachelor\'s in Information Systems', school: 'University of Boumerdès', period: '2015 – 2017', location: 'Algeria', detail: 'Computer science fundamentals, databases and programming.' },
       ],
     },
     interests: {
@@ -243,6 +255,8 @@ export const translations = {
       suggestPrompt: 'You can ask about: experience, projects, skills, contact, education, interests, or languages.',
       whichProject: 'I can go into detail on: Correxia, NFT Landing, Curtain & RDV app, Football Club. Which one interests you?',
       alsoAsk: 'You can also ask about my projects or skills.',
+      location: 'Based in Paris. Experience in Algeria and France.',
+      languages: 'Arabic, English, French',
       followUps: {
         moreProject: 'Tell me more (curtains)',
         experience: 'My experience',

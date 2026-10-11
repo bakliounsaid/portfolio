@@ -84,15 +84,15 @@ export default function Contact({ data }) {
     }
   }
 
-  const inputBase = 'w-full px-3 py-2 rounded-lg border-2 bg-white dark:bg-slate-700/80 text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 transition-colors duration-200'
+  const inputBase = 'w-full px-3.5 py-2.5 rounded-xl border bg-white dark:bg-slate-800/80 text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 transition-colors duration-200'
   const inputError = 'border-red-500 dark:border-red-400 focus:ring-red-400 dark:focus:ring-red-500'
-  const inputOk = 'border-slate-300 dark:border-indigo-400/40 focus:ring-slate-400 dark:focus:ring-indigo-500'
+  const inputOk = 'border-slate-300 dark:border-slate-700 focus:ring-indigo-500/60 focus:border-indigo-500'
 
   return (
     <Section id="contact" title={labels.title || 'Contact'}>
       <form
         onSubmit={handleSubmit}
-        className="max-w-md mx-auto p-6 rounded-xl border-2 border-slate-300 dark:border-indigo-400/50 bg-white dark:bg-slate-900/95 shadow-md shadow-slate-200/50 dark:shadow-xl dark:shadow-black/40 space-y-4"
+        className="max-w-lg mx-auto p-6 md:p-8 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/70 shadow-sm space-y-5"
       >
         <div>
           <label htmlFor="email" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
@@ -146,7 +146,7 @@ export default function Contact({ data }) {
           <button
             type="submit"
             disabled={loading}
-            className="px-4 py-2 rounded-lg border-2 border-black dark:border-white bg-black dark:bg-white text-white dark:text-black hover:bg-slate-800 dark:hover:bg-slate-100 text-sm font-semibold transition-all duration-300 hover:scale-105 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
+            className="w-full px-4 py-2.5 rounded-xl border-2 border-black dark:border-white bg-black dark:bg-white text-white dark:text-black hover:bg-slate-800 dark:hover:bg-slate-100 text-sm font-semibold transition-all duration-300 hover:scale-105 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
           >
             {loading ? (labels.sending || 'Sending...') : (labels.send || 'Send')}
           </button>

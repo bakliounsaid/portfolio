@@ -7,7 +7,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['images/avatar.png'],
+      includeAssets: ['images/avatar.png', 'images/icon-192.png', 'images/icon-512.png'],
       manifest: {
         name: 'Baklioun ESSAID – Développeur Web',
         short_name: 'Baklioun ESSAID',
@@ -18,17 +18,26 @@ export default defineConfig({
         start_url: '/',
         scope: '/',
         lang: 'fr',
-        // Ta photo (avatar) comme icône PWA pour l’installation bureau et mobile
+        // Icônes carrées générées à partir de l’avatar (installation bureau et mobile)
         icons: [
-          { src: 'images/avatar.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
-          { src: 'images/avatar.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
-          { src: 'images/avatar.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+          { src: 'images/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
+          { src: 'images/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
+          { src: 'images/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
         ],
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+        globPatterns: ['**/*.{js,css,html,ico,png,webp,svg,woff2}'],
         navigateFallback: '/index.html',
         runtimeCaching: [
+          {
+            urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'google-fonts-webfonts',
+              expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 * 24 * 365 },
+              cacheableResponse: { statuses: [0, 200] },
+            },
+          },
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
             handler: 'CacheFirst',

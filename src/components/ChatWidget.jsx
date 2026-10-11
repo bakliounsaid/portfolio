@@ -1,12 +1,24 @@
 /**
  * Chat : discussion fluide, bulle + avatar sur chaque réponse, questions libres, contexte et relances.
- * Langue = langue du portfolio.
+ * Langue = langue du portfolio (réponses construites à partir des traductions).
  */
 
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useLanguage } from '../context/LanguageContext'
 import profile from '../data/profile'
 import { AVATAR } from '../constants'
+
+// Minuscules + suppression des accents : « Compétences » → « competences ».
+// Sans ça, \b ne reconnaît pas les mots accentués (é n'est pas un caractère de mot en regex JS).
+const normalize = (s) => (s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').trim()
+
+// Mots-clés (sans accents) → id du projet
+const PROJECT_KEYWORDS = [
+  [/\b(rideaux?|curtains?|rdv|rendez[- ]vous|appointments?)\b/, 'curtain-rdv'],
+  [/\b(football|club|sport)\b/, 'football-club'],
+  [/\b(nft|oeuvre|art|mint|landing)\b/, 'nft-landing'],
+  [/\b(correxia|correction|ocr|examens?|exams?)\b/, 'correxia'],
+]
 
 export default function ChatWidget() {
   const { t } = useLanguage()
@@ -15,7 +27,14 @@ export default function ChatWidget() {
   const [messages, setMessages] = useState([])
   const [lastTopic, setLastTopic] = useState(null)
   const [isTyping, setIsTyping] = useState(false)
+  const scrollRef = useRef(null)
   const c = t.chat || {}
+
+  // Défilement automatique vers le dernier message
+  useEffect(() => {
+    const el = scrollRef.current
+    if (el) el.scrollTop = el.scrollHeight
+  }, [messages, isTyping, open])
 
   const intents = [
     { key: 'experience', label: c.intents?.experience, query: 'experience' },
@@ -24,97 +43,96 @@ export default function ChatWidget() {
     { key: 'contact', label: c.intents?.contact, query: 'contact' },
   ].filter((i) => i.label)
 
-  const matchReply = (text, ctx = {}) => {
-    const lower = (text || '').toLowerCase().trim()
-    const { lastTopic: topic } = ctx
+  // Données dans la langue courante (fallback : profile.js)
+  const experience = t.experience?.entries || profile.experience
+  const education = t.education?.entries || profile.education || []
+  const interests = t.interests?.entries || profile.interests || []
+  const sk = t.skills || {}
+  const allSkills = [
+    ...(sk.backendItems || profile.skills?.backend || []),
+    ...(sk.frontendItems || profile.skills?.frontend || []),
+    ...(sk.databasesItems || profile.skills?.databases || []),
+    ...(sk.toolsItems || profile.skills?.tools || []),
+    ...(sk.aiItems || profile.skills?.ai || []),
+  ]
+  const projectText = (p, full = false) => {
+    const pt = t.projects?.[p.id] || {}
+    const desc = full ? (pt.fullDescription || p.fullDescription || pt.description || p.description) : (pt.description || p.description)
+    return `${pt.title || p.title} : ${desc}`
+  }
 
-    // Relances : "en savoir plus", "continue", "and?", "what else", "autre chose", "détails"
-    const isFollowUp = /\b(more|plus|continue|and\?|tell\s*me\s*more|précise|détails|what\s*else|autre\s*chose|quoi\s*d'autre|next|suivant|encore|again)\b/.test(lower)
+  const matchReply = (text, ctx = {}) => {
+    const lower = normalize(text)
+    const { lastTopic: topic } = ctx
+    const isProjectsTopic = (topic || '').startsWith('projects')
+
+    // Projet précis mentionné (prioritaire, même dans une relance « en savoir plus sur correxia »)
+    const hit = PROJECT_KEYWORDS.find(([re]) => re.test(lower))
+    if (hit) {
+      const p = profile.projects.find((x) => x.id === hit[1])
+      if (p) return { reply: projectText(p, true), topic: `projects:${p.id}` }
+    }
+
+    // « Ce projet », « that project » : reprend le dernier projet évoqué
+    if (isProjectsTopic && /\b(that\s*project|this\s*project|ce\s*projet|celui[- ]la)\b/.test(lower)) {
+      const p = profile.projects.find((x) => x.id === topic.split(':')[1])
+      return p ? { reply: projectText(p, true), topic } : { reply: c.whichProject || '', topic: 'projects' }
+    }
+
+    // Relances : "en savoir plus", "continue", "what else", "autre chose", "détails"
+    const isFollowUp = /\b(more|plus|continue|tell\s*me\s*more|precise|details?|what\s*else|autre\s*chose|quoi\s*d'autre|next|suivant|encore|again)\b/.test(lower)
     if (isFollowUp && topic) {
-      if (topic === 'projects' || (topic || '').startsWith('projects')) {
-        const list = profile.projects.map((p) => p.title).join(', ')
-        return { reply: (c.whichProject || `Je peux détailler : ${list}. Dites lequel vous intéresse.`), topic: 'projects' }
-      }
+      if (isProjectsTopic) return { reply: c.whichProject || '', topic: 'projects' }
       if (topic === 'experience') {
-        const e = profile.experience[0]
+        const e = experience[0]
         const extra = (e?.points || [])[1] || (e?.points || [])[0] || ''
         const more = e ? `${e.title} @ ${e.company} — ${extra}` : ''
-        return { reply: more + (more ? '. ' : '') + (c.alsoAsk || 'Vous pouvez aussi me demander mes projets ou compétences.'), topic: 'experience' }
+        return { reply: more + (more ? '. ' : '') + (c.alsoAsk || ''), topic: 'experience' }
       }
-      if (topic === 'skills') {
-        const all = [...(profile.skills?.backend || []), ...(profile.skills?.databases || []), ...(profile.skills?.tools || []), ...(profile.skills?.ai || [])]
-        return { reply: all.join(', '), topic: 'skills' }
-      }
-      return { reply: (c.fallback || '') + ' ' + (c.suggestPrompt || ''), topic: 'fallback' }
+      if (topic === 'skills') return { reply: allSkills.join(', '), topic: 'skills' }
     }
 
-    // "Ce projet", "that project", "the curtain one" quand le dernier sujet était les projets
-    if (topic && (topic === 'projects' || (topic || '').startsWith('projects')) && /\b(that\s*project|ce\s*projet|celui[- ]là|the\s*curtain|celui\s*des\s*rideaux)\b/.test(lower)) {
-      const p = profile.projects.find((x) => /rideaux|curtain|rdv/i.test(x.title))
-      if (p) return { reply: `${p.title} : ${p.fullDescription || p.description}`, topic: 'projects' }
-    }
+    // Projets (général)
+    if (/\b(projets?|projects?|portfolio|realisations?)\b/.test(lower))
+      return { reply: profile.projects.map((p) => projectText(p)).join(' | '), topic: 'projects' }
 
-    // Qui / nom / you / présentation — formulations plus souples
-    if (/\b(qui|who|you|nom|name|présente|present|tell\s*me\s*about|about\s*you|dis[- ]moi|parle[- ]moi|what\s*about\s*you|how\s*about\s*you)\b/.test(lower))
-      return { reply: `${profile.hero.name}. ${profile.hero.tagline} ${profile.contact.email}`, topic: 'who' }
+    // Compétences / technos
+    if (/\b(skills?|competences?|technos?|technologies?|tech|stack|laravel|php|python|fastapi|java|spring|vue(\.?js)?|javascript|js|livewire|mysql|postgres(ql)?|api|docker|git|frontend|front|backend|back)\b/.test(lower))
+      return { reply: allSkills.join(', '), topic: 'skills' }
 
-    // Expérience — formulations étendues
-    if (/\b(exp|experience|xp|travail|work|job|emploi|fb|fb-technologies|autoentrepreneur|cdta|collège|parcours|background)\b/.test(lower)) {
-      const txt = profile.experience.map((e) => `${e.title} @ ${e.company} (${e.period}) — ${(e.points || [])[0] || ''}`).join(' | ')
+    // Expérience
+    if (/\b(exp|experiences?|xp|travail|work|jobs?|emplois?|fb|fb-technologies|autoentrepreneur|freelance|cdta|college|parcours|background|career|carriere)\b/.test(lower)) {
+      const txt = experience.map((e) => `${e.title} @ ${e.company} (${e.period}) — ${(e.points || [])[0] || ''}`).join(' | ')
       return { reply: txt, topic: 'experience' }
     }
 
-    // Projets (général ou par nom) — formulations souples
-    if (/\b(projet|project|projets|dis[- ]moi\s*sur|parle[- ]moi\s*de|what\s*about|how\s*about)\b/.test(lower)) {
-      const all = profile.projects.map((p) => `${p.title}: ${p.description || p.fullDescription || ''}`).join(' | ')
-      if (/\b(rideaux|curtain|rdv)\b/.test(lower)) {
-        const p = profile.projects.find((x) => /rideaux|curtain|rdv/i.test(x.title))
-        return { reply: p ? `${p.title}: ${p.fullDescription || p.description}` : all, topic: 'projects' }
-      }
-      if (/\b(football|club|sport)\b/.test(lower)) {
-        const p = profile.projects.find((x) => /football|club/i.test(x.title))
-        return { reply: p ? `${p.title}: ${p.fullDescription || p.description}` : all, topic: 'projects' }
-      }
-      if (/\b(nft|oeuvre|art|mint|landing)\b/.test(lower)) {
-        const p = profile.projects.find((x) => /nft/i.test(x.title))
-        return { reply: p ? `${p.title}: ${p.fullDescription || p.description}` : all, topic: 'projects' }
-      }
-      if (/\b(correxia|correction|ocr|examen|exam)\b/.test(lower)) {
-        const p = profile.projects.find((x) => /correxia/i.test(x.title))
-        return { reply: p ? `${p.title}: ${p.fullDescription || p.description}` : all, topic: 'projects' }
-      }
-      return { reply: all, topic: 'projects' }
-    }
+    // Formation / école
+    if (/\b(formations?|education|ecoles?|school|etudes?|studies|diplomes?|degree|licence|bachelor|master|hetic|boumerdes|universite|university)\b/.test(lower))
+      return { reply: education.map((e) => `${e.title} – ${e.school} (${e.period})`).join('. '), topic: 'education' }
 
-    // Compétences / technos
-    if (/\b(skill|compétence|techno|tech|laravel|php|livewire|mysql|api|docker|git)\b/.test(lower)) {
-      const all = [...(profile.skills?.backend || []), ...(profile.skills?.databases || []), ...(profile.skills?.tools || []), ...(profile.skills?.ai || [])]
-      return { reply: all.join(', '), topic: 'skills' }
-    }
-
-    // Contact
-    if (/\b(contact|mail|email|joindre|reach)\b/.test(lower))
-      return { reply: `${profile.contact.email} | ${profile.contact.phone}`, topic: 'contact' }
-    if (/\b(tel|phone|téléphone)\b/.test(lower)) return { reply: profile.contact.phone, topic: 'contact' }
-    if (/\b(mail|email|e-mail|courriel)\b/.test(lower)) return { reply: profile.contact.email, topic: 'contact' }
+    // Contact (cas précis d'abord)
+    if (/\b(tel|phone|telephone|numero|number)\b/.test(lower)) return { reply: profile.contact.phone, topic: 'contact' }
     if (/\b(linkedin|linked)\b/.test(lower)) return { reply: profile.contact.linkedin, topic: 'contact' }
     if (/\b(github|git\s*hub)\b/.test(lower)) return { reply: profile.contact.github, topic: 'contact' }
     if (/\b(cv|resume|curriculum)\b/.test(lower)) return { reply: profile.contact.cv, topic: 'contact' }
-
-    // Formation / école
-    if (/\b(formation|education|école|school|étud|hetic|boumerdès|université)\b/.test(lower))
-      return { reply: (profile.education || []).map((e) => `${e.title} – ${e.school} (${e.period})`).join('. '), topic: 'education' }
+    if (/\b(contacts?|contacter|joindre|reach|e-?mails?|mail|courriel|ecrire)\b/.test(lower))
+      return { reply: `${profile.contact.email} | ${profile.contact.phone}`, topic: 'contact' }
 
     // Langues
-    if (/\b(langue|language)\b/.test(lower)) return { reply: (profile.languages || []).join(', '), topic: 'languages' }
+    if (/\b(langues?|languages?|parles?|speak)\b/.test(lower))
+      return { reply: c.languages || (profile.languages || []).join(', '), topic: 'languages' }
 
     // Centres d'intérêt
-    if (/\b(intérêt|interest|passion|loisir)\b/.test(lower))
-      return { reply: (profile.interests || []).map((i) => `${i.label}: ${i.description}`).join(' | '), topic: 'interests' }
+    if (/\b(interets?|interests?|passions?|loisirs?|hobbies|hobby)\b/.test(lower))
+      return { reply: interests.map((i) => `${i.label} : ${i.description}`).join(' | '), topic: 'interests' }
 
     // Lieu / localisation
-    if (/\b(ou\s*es|where|paris|alger|algérie|france)\b/.test(lower))
-      return { reply: `${profile.contact.location || 'Paris'}. Expérience en Algérie et en France.`, topic: 'location' }
+    if (/\b(ou\s*es|ou\s*habites?|where|based|location|localisation|paris|alger|algerie|algeria|france)\b/.test(lower))
+      return { reply: c.location || profile.contact.location, topic: 'location' }
+
+    // Qui / présentation (en dernier : « qui » apparaît dans beaucoup de phrases)
+    if (/\b(qui|who|nom|name|presente|introduce|about\s*you|a\s*propos\s*de\s*(toi|vous))\b/.test(lower))
+      return { reply: `${profile.hero.name}. ${t.hero?.tagline || profile.hero.tagline} ${profile.contact.email}`, topic: 'who' }
 
     // Fallback
     return { reply: (c.fallback || profile.hero.tagline) + ' ' + (c.suggestPrompt || ''), topic: 'fallback' }
@@ -123,27 +141,29 @@ export default function ChatWidget() {
   const getFollowUps = (topic) => {
     const fu = c.followUps || {}
     if (topic === 'experience') return [{ label: fu.projects || c.intents?.projects, query: 'projets' }, { label: fu.contact || c.intents?.contact, query: 'contact' }]
-    if (topic === 'projects' || (topic || '').startsWith('projects')) return [{ label: fu.moreProject || 'En savoir plus (rideaux)', query: 'projet rideaux' }, { label: fu.skills || c.intents?.skills, query: 'compétences' }, { label: fu.contact || c.intents?.contact, query: 'contact' }]
+    if ((topic || '').startsWith('projects')) return [{ label: fu.moreProject, query: 'projet rideaux' }, { label: fu.skills || c.intents?.skills, query: 'compétences' }, { label: fu.contact || c.intents?.contact, query: 'contact' }].filter((s) => s.label)
     if (topic === 'skills') return [{ label: fu.experience || c.intents?.experience, query: 'experience' }, { label: fu.contact || c.intents?.contact, query: 'contact' }]
     if (topic === 'contact') return [{ label: fu.projects || c.intents?.projects, query: 'projets' }, { label: fu.experience || c.intents?.experience, query: 'experience' }]
     return [{ label: fu.experience || c.intents?.experience, query: 'experience' }, { label: fu.projects || c.intents?.projects, query: 'projets' }, { label: fu.contact || c.intents?.contact, query: 'contact' }]
   }
 
   const runReply = (userText, opts = {}) => {
+    if (isTyping) return
     const { userLabel } = opts
-    const out = matchReply(userText, { lastTopic })
-    const res = typeof out === 'string' ? { reply: out, topic: 'fallback' } : out
+    const res = matchReply(userText, { lastTopic })
     setLastTopic(res.topic)
+    // Le message de l'utilisateur s'affiche tout de suite, la réponse après l'indicateur de saisie
+    setMessages((m) => [...m, { role: 'user', content: userLabel || userText }])
     setIsTyping(true)
     setTimeout(() => {
-      setMessages((m) => [...m, { role: 'user', content: userLabel || userText }, { role: 'assistant', content: res.reply, topic: res.topic }])
+      setMessages((m) => [...m, { role: 'assistant', content: res.reply, topic: res.topic }])
       setIsTyping(false)
     }, 340)
   }
 
   const handleSend = () => {
     const txt = input.trim()
-    if (!txt) return
+    if (!txt || isTyping) return
     setInput('')
     runReply(txt)
   }
@@ -184,7 +204,7 @@ export default function ChatWidget() {
           </div>
 
           {/* Zone des messages — discussion */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4 max-h-80">
+          <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-4 max-h-80">
             {messages.length === 0 && (
               <div className="space-y-3">
                 {/* Premier message de bienvenue (toi) pour lancer la discussion */}
@@ -264,6 +284,7 @@ export default function ChatWidget() {
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSend()}
               placeholder={c.placeholder || 'Ask a question...'}
+              aria-label={c.placeholder || 'Message'}
               className="flex-1 px-3 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-800 dark:text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent"
             />
             <button

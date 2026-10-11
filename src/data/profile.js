@@ -22,7 +22,8 @@ export default {
     cv: 'https://drive.google.com/file/d/1aKqYM13ju9lIdy4m_z1Q-lBzo6nsbkkl/view?usp=sharing',
   },
   skills: {
-    backend: ['Java', 'Spring Boot', 'Laravel', 'CodeIgniter', 'PHP', 'API REST', 'Livewire'],
+    backend: ['Java', 'Spring Boot', 'Python', 'FastAPI', 'Laravel', 'CodeIgniter', 'PHP', 'API REST'],
+    frontend: ['JavaScript', 'Vue.js', 'Livewire'],
     databases: ['MySQL', 'PostgreSQL', 'SQLite'],
     tools: ['Git', 'Docker', 'Déploiement & maintenance', 'Sécurité & performance'],
     ai: ['LLMs', 'Outils d\'IA pour la conception et l\'optimisation'],
@@ -97,7 +98,7 @@ export default {
       description: 'Prise de rendez-vous en ligne et e-commerce pour une entreprise de rideaux. Laravel & Livewire.',
       fullDescription: 'I worked on the design and development of a full-featured appointment booking and e-commerce web application for a curtain installation company. The platform allows customers to schedule installation appointments online, browse available curtain products, and purchase items directly through the application. The system was built using Laravel and Livewire, enabling a dynamic, reactive user experience with real-time interactions and minimal page reloads. Beyond core booking and sales features, I implemented order management workflows, customer data handling, and admin-side tools to help the business manage appointments, products, and orders efficiently. I also integrated local delivery solutions in Algeria, ensuring that online purchases could be shipped reliably while respecting local logistics constraints and payment workflows. From a business perspective, this solution helped the company automate manual processes, reduce scheduling errors, expand its sales channels, and offer a modern digital experience to its customers. This project demonstrates my ability to analyze real-world business needs, design scalable backend-driven systems, and deliver practical, high-impact solutions using modern web technologies.',
       image: '/images/curtain-app.png',
-      images: ['/images/curtain-app.png', '/images/curtain-app-rdv.png', '/images/curtain-app-products.png'],
+      images: ['/images/curtain-app.png', '/images/curtain-app-rdv.webp', '/images/curtain-app-products.webp'],
       technologies: ['Laravel', 'Livewire', 'MySQL'],
     },
     {
@@ -112,15 +113,28 @@ export default {
   ],
   education: [
     {
-      title: '4e Année Programme Grande École',
-      school: 'Hetic',
-      period: 'Depuis octobre 2025',
+      title: 'Programme Grande École – 5e année',
+      school: 'HETIC',
+      period: '2026 – 2027',
+      location: 'France',
+      current: true,
+    },
+    {
+      title: 'Programme Grande École – 4e année',
+      school: 'HETIC',
+      period: '2025 – 2026',
       location: 'France',
     },
     {
-      title: 'Mastère en Génie Logiciel',
+      title: 'Master en Ingénierie du Logiciel et Traitement de l\'Information',
       school: 'Université de Boumerdès',
-      period: '2015 – 2019',
+      period: '2017 – 2019',
+      location: 'Algérie',
+    },
+    {
+      title: 'Licence en Systèmes d\'Information',
+      school: 'Université de Boumerdès',
+      period: '2015 – 2017',
       location: 'Algérie',
     },
   ],
