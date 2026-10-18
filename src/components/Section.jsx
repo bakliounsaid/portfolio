@@ -1,18 +1,23 @@
 /**
- * Conteneur de section avec titre optionnel (barre d'accent + titre).
+ * Conteneur de section : index monospace (« 01 / »), titre, ligne fine qui s'estompe.
  */
 
-export default function Section({ id, title, children, className = '' }) {
+import Reveal from './Reveal'
+
+export default function Section({ id, index, title, children, className = '' }) {
   return (
-    <section id={id} className={`py-14 md:py-20 scroll-mt-16 ${className}`}>
-      <div className="max-w-5xl mx-auto px-4 md:px-6">
+    <section id={id} className={`relative py-20 md:py-28 scroll-mt-20 ${className}`}>
+      <div className="container-x">
         {title && (
-          <div className="mb-10 md:mb-12">
-            <span className="block w-10 h-1 rounded-full bg-gradient-to-r from-indigo-500 to-violet-500 mb-3" aria-hidden />
-            <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white">
-              {title}
-            </h2>
-          </div>
+          <Reveal className="mb-10 md:mb-14 flex items-center gap-4">
+            {index && (
+              <span className="font-mono text-xs text-accent shrink-0" aria-hidden>
+                {index} /
+              </span>
+            )}
+            <h2 className="font-display text-3xl md:text-5xl font-semibold tracking-tight text-fg">{title}</h2>
+            <span className="h-px min-w-[2rem] flex-1 bg-gradient-to-r from-line to-transparent" aria-hidden />
+          </Reveal>
         )}
         {children}
       </div>

@@ -1,20 +1,40 @@
 /**
- * Contact – formulaire (email, subject, message) envoyé via Formspree.
+ * Contact – deux colonnes sur desktop : moyens de contact directs à gauche, formulaire à droite.
+ * Formulaire (email, subject, message) envoyé via Formspree.
  * Validation des champs, erreurs affichées, snackbar de succès ou d'erreur.
  * VITE_FORMSPREE_ID dans .env override la valeur par défaut.
  */
 
 import { useState, useEffect } from 'react'
 import Section from '../components/Section'
+import Card from '../components/Card'
+import Reveal from '../components/Reveal'
+import Icon from '../components/Icon'
 import { useLanguage } from '../context/LanguageContext'
+import profile from '../data/profile'
 
 const FORMSPREE_ID = import.meta.env.VITE_FORMSPREE_ID || 'xpqdzvaw'
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
+// « https://www.linkedin.com/in/x » → « linkedin.com/in/x »
+const strip = (url) => (url || '').replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '')
+
+function FieldError({ id, message }) {
+  if (!message) return null
+  return (
+    <p id={id} className="mt-2 flex items-center gap-1.5 text-sm text-red-600 dark:text-red-400">
+      <Icon name="alert" className="h-4 w-4 shrink-0" />
+      {message}
+    </p>
+  )
+}
+
 export default function Contact({ data }) {
   const { t } = useLanguage()
   const labels = t.contact || {}
+  const f = t.footer || {}
+  const c = data || profile.contact || {}
   const [email, setEmail] = useState('')
   const [subject, setSubject] = useState('')
   const [message, setMessage] = useState('')
@@ -84,94 +104,158 @@ export default function Contact({ data }) {
     }
   }
 
-  const inputBase = 'w-full px-3.5 py-2.5 rounded-xl border bg-white dark:bg-slate-800/80 text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 transition-colors duration-200'
-  const inputError = 'border-red-500 dark:border-red-400 focus:ring-red-400 dark:focus:ring-red-500'
-  const inputOk = 'border-slate-300 dark:border-slate-700 focus:ring-indigo-500/60 focus:border-indigo-500'
+  const inputBase =
+    'block w-full rounded-xl border bg-bg/60 px-4 py-3 text-base text-fg placeholder:text-subtle/80 transition-[border-color,box-shadow,background-color] duration-200 focus:bg-bg focus:outline-none focus:ring-4 disabled:opacity-60 sm:text-sm'
+  const inputError = 'border-red-500/70 focus:border-red-500 focus:ring-red-500/15'
+  const inputOk = 'border-line hover:border-subtle/50 focus:border-accent focus:ring-accent/15'
+
+  // Attributs ARIA liant chaque champ à son message d'erreur
+  const fieldProps = (name) => ({
+    'aria-invalid': errors[name] ? true : undefined,
+    'aria-describedby': errors[name] ? `${name}-error` : undefined,
+  })
+
+  const channels = [
+    { icon: 'mail', label: f.email || 'E-mail', value: c.email, href: `mailto:${c.email}` },
+    { icon: 'phone', label: f.phone || 'Téléphone', value: c.phone, href: `tel:${c.phone}` },
+    { icon: 'linkedin', label: f.linkedin || 'LinkedIn', value: strip(c.linkedin), href: c.linkedin, external: true },
+    { icon: 'github', label: f.github || 'GitHub', value: strip(c.github), href: c.github, external: true },
+  ]
 
   return (
-    <Section id="contact" title={labels.title || 'Contact'}>
-      <form
-        onSubmit={handleSubmit}
-        className="max-w-lg mx-auto p-6 md:p-8 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/70 shadow-sm space-y-5"
-      >
-        <div>
-          <label htmlFor="email" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-            {labels.email ?? 'Your email'}
-          </label>
-          <input
-            id="email"
-            type="email"
-            value={email}
-            onChange={(e) => { setEmail(e.target.value); setErrors((err) => ({ ...err, email: undefined })) }}
-            placeholder={labels.placeholderEmail ?? 'your@email.com'}
-            className={`${inputBase} ${errors.email ? inputError : inputOk}`}
-            disabled={loading}
-          />
-          {errors.email && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.email}</p>}
-        </div>
+    <Section id="contact" index="07" title={labels.title || 'Contact'}>
+      <div className="grid gap-10 lg:grid-cols-12 lg:gap-12">
+        {/* Moyens de contact directs */}
+        <Reveal className="lg:col-span-5">
+          <p className="font-display text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">
+            <span className="text-gradient">{t.hero?.contactMe || 'Contact me'}</span>
+          </p>
+          <ul className="mt-8 space-y-3">
+            {channels.map(({ icon, label, value, href, external }) => (
+              <li key={icon}>
+                <Card
+                  as="a"
+                  href={href}
+                  {...(external && { target: '_blank', rel: 'noopener noreferrer' })}
+                  className="group flex items-center gap-4 p-4"
+                >
+                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-line bg-bg text-accent transition-colors duration-300 group-hover:border-transparent group-hover:bg-brand group-hover:text-white">
+                    <Icon name={icon} className="h-5 w-5" />
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="eyebrow block">{label}</span>
+                    <span className="mt-0.5 block truncate text-sm font-medium text-fg">{value}</span>
+                  </span>
+                  <Icon
+                    name="arrowUpRight"
+                    className="h-4 w-4 shrink-0 text-subtle transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-fg"
+                    strokeWidth={2}
+                  />
+                </Card>
+              </li>
+            ))}
+          </ul>
+        </Reveal>
 
-        <div>
-          <label htmlFor="subject" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-            {labels.subject || 'Subject'}
-          </label>
-          <input
-            id="subject"
-            type="text"
-            value={subject}
-            onChange={(e) => { setSubject(e.target.value); setErrors((err) => ({ ...err, subject: undefined })) }}
-            placeholder={labels.placeholderSubject || 'Your subject'}
-            className={`${inputBase} ${errors.subject ? inputError : inputOk}`}
-            disabled={loading}
-          />
-          {errors.subject && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.subject}</p>}
-        </div>
+        {/* Formulaire */}
+        <Reveal delay={120} className="lg:col-span-7">
+          <Card lift={false} as="form" onSubmit={handleSubmit} noValidate className="space-y-5 p-5 sm:p-8">
+            <div className="grid gap-5 sm:grid-cols-2">
+              <div>
+                <label htmlFor="email" className="mb-2 block text-sm font-medium text-fg">
+                  {labels.email ?? 'Your email'}
+                </label>
+                <input
+                  id="email"
+                  type="email"
+                  autoComplete="email"
+                  value={email}
+                  onChange={(e) => { setEmail(e.target.value); setErrors((err) => ({ ...err, email: undefined })) }}
+                  placeholder={labels.placeholderEmail ?? 'your@email.com'}
+                  className={`${inputBase} ${errors.email ? inputError : inputOk}`}
+                  disabled={loading}
+                  {...fieldProps('email')}
+                />
+                <FieldError id="email-error" message={errors.email} />
+              </div>
 
-        <div>
-          <label htmlFor="message" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-            {labels.message || 'Message'}
-          </label>
-          <textarea
-            id="message"
-            value={message}
-            onChange={(e) => { setMessage(e.target.value); setErrors((err) => ({ ...err, message: undefined })) }}
-            placeholder={labels.placeholderMessage || 'Your message'}
-            rows={4}
-            className={`${inputBase} resize-y ${errors.message ? inputError : inputOk}`}
-            disabled={loading}
-          />
-          {errors.message && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.message}</p>}
-        </div>
+              <div>
+                <label htmlFor="subject" className="mb-2 block text-sm font-medium text-fg">
+                  {labels.subject || 'Subject'}
+                </label>
+                <input
+                  id="subject"
+                  type="text"
+                  value={subject}
+                  onChange={(e) => { setSubject(e.target.value); setErrors((err) => ({ ...err, subject: undefined })) }}
+                  placeholder={labels.placeholderSubject || 'Your subject'}
+                  className={`${inputBase} ${errors.subject ? inputError : inputOk}`}
+                  disabled={loading}
+                  {...fieldProps('subject')}
+                />
+                <FieldError id="subject-error" message={errors.subject} />
+              </div>
+            </div>
 
-        <div className="flex justify-center pt-1">
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full px-4 py-2.5 rounded-xl border-2 border-black dark:border-white bg-black dark:bg-white text-white dark:text-black hover:bg-slate-800 dark:hover:bg-slate-100 text-sm font-semibold transition-all duration-300 hover:scale-105 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
-          >
-            {loading ? (labels.sending || 'Sending...') : (labels.send || 'Send')}
-          </button>
-        </div>
-      </form>
+            <div>
+              <label htmlFor="message" className="mb-2 block text-sm font-medium text-fg">
+                {labels.message || 'Message'}
+              </label>
+              <textarea
+                id="message"
+                value={message}
+                onChange={(e) => { setMessage(e.target.value); setErrors((err) => ({ ...err, message: undefined })) }}
+                placeholder={labels.placeholderMessage || 'Your message'}
+                rows={6}
+                className={`${inputBase} min-h-[9rem] resize-y ${errors.message ? inputError : inputOk}`}
+                disabled={loading}
+                {...fieldProps('message')}
+              />
+              <FieldError id="message-error" message={errors.message} />
+            </div>
 
-      {/* Snackbar */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="btn-primary h-12 w-full disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
+            >
+              {loading ? (
+                <>
+                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" aria-hidden />
+                  {labels.sending || 'Sending...'}
+                </>
+              ) : (
+                <>
+                  {labels.send || 'Send'}
+                  <Icon name="send" className="h-4 w-4" strokeWidth={1.75} />
+                </>
+              )}
+            </button>
+          </Card>
+        </Reveal>
+      </div>
+
+      {/* Snackbar (au-dessus du bouton de chat sur mobile) */}
       {snackbar && (
         <div
-          className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] px-4 py-3 rounded-lg shadow-lg text-white text-sm font-medium flex items-center gap-2 ${
+          className={`fixed bottom-24 left-1/2 z-[100] flex w-max max-w-[calc(100vw-2rem)] -translate-x-1/2 items-center gap-3 rounded-2xl border bg-surface/90 px-4 py-3 text-sm font-medium shadow-2xl backdrop-blur-xl sm:bottom-6 ${
             snackbar === 'success'
-              ? 'bg-emerald-600 dark:bg-emerald-500'
-              : 'bg-red-600 dark:bg-red-500'
+              ? 'border-emerald-500/30 text-emerald-700 dark:text-emerald-300'
+              : 'border-red-500/30 text-red-700 dark:text-red-300'
           }`}
           role="alert"
         >
-          {snackbar === 'success' ? (
-            <>
-              <span>✓</span> {labels.successMessage || 'Message sent successfully.'}
-            </>
-          ) : (
-            <>
-              <span>✕</span> {submitError || (labels.errSend || 'Error sending.')}
-            </>
-          )}
+          <span
+            className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-white ${
+              snackbar === 'success' ? 'bg-emerald-600' : 'bg-red-600'
+            }`}
+            aria-hidden
+          >
+            <Icon name={snackbar === 'success' ? 'check' : 'close'} className="h-3.5 w-3.5" strokeWidth={2.5} />
+          </span>
+          {snackbar === 'success'
+            ? labels.successMessage || 'Message sent successfully.'
+            : submitError || labels.errSend || 'Error sending.'}
         </div>
       )}
     </Section>

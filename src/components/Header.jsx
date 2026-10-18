@@ -1,245 +1,278 @@
 /**
- * Nav : ancres (bold, ligne blanche si sélectionné), dropdown FR/EN, thème. Sans nom dans la barre.
+ * Nav : barre flottante en pilule (flou d'arrière-plan), barre de progression de lecture,
+ * scroll-spy, bascule FR/EN, thème clair/sombre, bouton CV, menu mobile plein écran.
+ * Hors de l'accueil (/project/:id), les ancres pointent vers « /#section ».
  */
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
+import { Link, useLocation } from 'react-router-dom'
 import { useLanguage } from '../context/LanguageContext'
 import profile from '../data/profile'
+import Icon from './Icon'
 
-// Composants SVG pour les drapeaux
-const FlagFR = () => (
-  <svg className="w-5 h-4" viewBox="0 0 20 15" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <rect width="6.67" height="15" fill="#002654"/>
-    <rect x="6.67" width="6.67" height="15" fill="#FFFFFF"/>
-    <rect x="13.33" width="6.67" height="15" fill="#ED2939"/>
-  </svg>
-)
+const SECTION_IDS = ['hero', 'about', 'projects', 'skills', 'education', 'experience', 'contact']
 
-const FlagGB = () => (
-  <svg className="w-5 h-4" viewBox="0 0 20 15" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <rect width="20" height="15" fill="#012169"/>
-    <path d="M0 0L20 15M20 0L0 15" stroke="white" strokeWidth="2"/>
-    <path d="M0 0L20 15M20 0L0 15" stroke="#C8102E" strokeWidth="1.33"/>
-    <path d="M10 0V15M0 7.5H20" stroke="white" strokeWidth="3.33"/>
-    <path d="M10 0V15M0 7.5H20" stroke="#C8102E" strokeWidth="2"/>
-  </svg>
-)
+// Ancre native sur l'accueil, lien routeur vers « /#id » ailleurs
+function NavLink({ isHome, id, className, children, ...rest }) {
+  return isHome ? (
+    <a href={`#${id}`} className={className} {...rest}>
+      {children}
+    </a>
+  ) : (
+    <Link to={`/#${id}`} className={className} {...rest}>
+      {children}
+    </Link>
+  )
+}
+
+function LangSwitch({ lang, setLang, className = '' }) {
+  return (
+    <div
+      role="group"
+      aria-label={lang === 'fr' ? 'Langue' : 'Language'}
+      className={`flex items-center rounded-full border border-line bg-bg/40 p-0.5 font-mono text-[11px] ${className}`}
+    >
+      {[
+        ['fr', 'Français'],
+        ['en', 'English'],
+      ].map(([code, name]) => (
+        <button
+          key={code}
+          type="button"
+          onClick={() => setLang(code)}
+          aria-pressed={lang === code}
+          aria-label={name}
+          title={name}
+          className={`rounded-full px-2.5 py-1.5 transition-colors duration-300 ${
+            lang === code ? 'bg-fg text-bg' : 'text-muted hover:text-fg'
+          }`}
+        >
+          {code.toUpperCase()}
+        </button>
+      ))}
+    </div>
+  )
+}
 
 export default function Header() {
   const { t, lang, setLang, dark, setDark } = useLanguage()
+  const { pathname } = useLocation()
+  const isHome = pathname === '/'
   const [open, setOpen] = useState(false)
-  const [langOpen, setLangOpen] = useState(false)
-  const [langMobileOpen, setLangMobileOpen] = useState(false)
   const [activeSection, setActiveSection] = useState('hero')
-  const langRef = useRef(null)
-  const langMobileRef = useRef(null)
+  const [progress, setProgress] = useState(0)
+  const [scrolled, setScrolled] = useState(false)
   const nav = t.nav || {}
 
   const links = [
-    { to: '#hero', label: nav.home },
-    { to: '#about', label: nav.about },
-    { to: '#projects', label: nav.projects },
-    { to: '#skills', label: nav.skills },
-    { to: '#contact', label: nav.contact },
+    { id: 'hero', label: nav.home },
+    { id: 'about', label: nav.about },
+    { id: 'projects', label: nav.projects },
+    { id: 'skills', label: nav.skills },
+    { id: 'education', label: nav.education },
+    { id: 'experience', label: nav.experience },
+    { id: 'contact', label: nav.contact },
   ]
 
-  // Scroll-spy : section active
+  // Scroll-spy + progression de lecture
   useEffect(() => {
-    const onScroll = () => {
-      const ids = ['hero', 'about', 'projects', 'skills', 'contact']
-      let active = 'hero'
-      for (const id of ids) {
-        const el = document.getElementById(id)
-        if (!el) continue
-        const r = el.getBoundingClientRect()
-        if (r.top <= 140) active = id
+    let frame = 0
+    const update = () => {
+      frame = 0
+      let active = isHome ? 'hero' : null
+      if (isHome) {
+        for (const id of SECTION_IDS) {
+          const el = document.getElementById(id)
+          if (el && el.getBoundingClientRect().top <= 140) active = id
+        }
       }
       setActiveSection(active)
+      const max = document.documentElement.scrollHeight - window.innerHeight
+      setProgress(max > 0 ? Math.min(1, window.scrollY / max) : 0)
+      setScrolled(window.scrollY > 8)
+    }
+    const onScroll = () => {
+      if (!frame) frame = requestAnimationFrame(update)
     }
     window.addEventListener('scroll', onScroll, { passive: true })
-    onScroll()
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [])
-
-  // Fermer le dropdown langue (desktop) au clic extérieur
-  useEffect(() => {
-    if (!langOpen) return
-    const fn = (e) => {
-      if (langRef.current && !langRef.current.contains(e.target)) setLangOpen(false)
+    window.addEventListener('resize', onScroll)
+    update()
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('resize', onScroll)
+      cancelAnimationFrame(frame)
     }
-    document.addEventListener('click', fn)
-    return () => document.removeEventListener('click', fn)
-  }, [langOpen])
+  }, [isHome])
 
-  // Fermer le dropdown langue (mobile) au clic extérieur
+  // Menu mobile : bloque le scroll de la page, ferme avec Échap
   useEffect(() => {
-    if (!langMobileOpen) return
-    const fn = (e) => {
-      if (langMobileRef.current && !langMobileRef.current.contains(e.target)) setLangMobileOpen(false)
+    if (!open) return
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    const onKey = (e) => e.key === 'Escape' && setOpen(false)
+    document.addEventListener('keydown', onKey)
+    return () => {
+      document.body.style.overflow = prev
+      document.removeEventListener('keydown', onKey)
     }
-    document.addEventListener('click', fn)
-    return () => document.removeEventListener('click', fn)
-  }, [langMobileOpen])
+  }, [open])
+
+  // Ferme le menu au changement de page
+  useEffect(() => setOpen(false), [pathname])
+
+  const themeLabel = dark ? (lang === 'fr' ? 'Mode clair' : 'Light mode') : lang === 'fr' ? 'Mode sombre' : 'Dark mode'
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-white/80 dark:bg-black/70 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800/80">
-      <div className="max-w-5xl mx-auto px-4 flex items-center justify-between h-14 md:h-16">
-        <nav className="hidden md:flex items-center gap-1">
-          {links.map(({ to, label }) => {
-            const id = to.slice(1)
-            const active = activeSection === id
-            return (
-              <a
-                key={to}
-                href={to}
-                className={`px-2 py-1.5 text-sm font-bold relative after:absolute after:left-2 after:right-2 after:bottom-0 after:h-0.5 after:transition-transform
-                  ${active
-                    ? 'text-black dark:text-white after:bg-black dark:after:bg-white after:scale-x-100'
-                    : 'text-black dark:text-slate-300 after:bg-black dark:after:bg-white after:scale-x-0 hover:text-black dark:hover:text-white hover:after:scale-x-100'
-                  }`}
-              >
-                {label}
-              </a>
-            )
-          })}
-        </nav>
+    <>
+      {/* Barre de progression de lecture */}
+      <div className="fixed inset-x-0 top-0 z-[60] h-0.5" aria-hidden>
+        <div className="h-full origin-left bg-brand" style={{ transform: `scaleX(${progress})` }} />
+      </div>
 
-        {/* Mobile: menu à gauche, CV à droite | Desktop: tout à droite */}
-        <div className="flex items-center gap-2 flex-1 md:flex-initial justify-between md:justify-end">
-          {/* Mobile : bouton menu à gauche */}
-          <button
-            type="button"
-            className="md:hidden p-2 text-black dark:text-slate-300 hover:text-black dark:hover:text-white transition-colors"
-            onClick={() => setOpen((o) => !o)}
-            aria-label="Menu"
+      <header className="fixed inset-x-0 top-3 z-50 px-3 sm:top-4 sm:px-6">
+        <div
+          className={`mx-auto flex h-14 max-w-6xl items-center justify-between gap-3 rounded-full border pl-2 pr-2 backdrop-blur-xl transition-all duration-500 sm:pl-3 ${
+            scrolled || open
+              ? 'border-line bg-surface/75 shadow-[0_12px_40px_-20px_rgb(0_0_0/0.45)]'
+              : 'border-line/60 bg-surface/40'
+          }`}
+        >
+          {/* Monogramme → accueil */}
+          <NavLink
+            isHome={isHome}
+            id="hero"
+            className="group flex items-center gap-2.5 rounded-full pr-2"
+            aria-label={`${profile.hero.name} – ${nav.home}`}
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden><path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" /></svg>
-          </button>
+            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-brand font-display text-sm font-bold text-white shadow-[0_6px_20px_-8px_rgb(var(--g2)/0.9)]">
+              BE
+            </span>
+            <span className="hidden font-display text-sm font-semibold tracking-tight text-fg sm:block lg:hidden 2xl:block">
+              {profile.hero.name}
+            </span>
+          </NavLink>
 
-          {/* CV + Lang + Theme : à droite (CV seul visible à droite sur mobile) */}
-          <div className="flex items-center gap-2">
+          {/* Liens desktop */}
+          <nav className="hidden lg:block" aria-label="Navigation">
+            <ul className="flex items-center gap-0.5">
+              {links.map(({ id, label }) => {
+                const active = activeSection === id
+                return (
+                  <li key={id}>
+                    <NavLink
+                      isHome={isHome}
+                      id={id}
+                      aria-current={active ? 'true' : undefined}
+                      className={`relative block rounded-full px-3 py-2 text-[13px] font-medium transition-colors duration-300 ${
+                        active ? 'bg-fg/[0.07] text-fg' : 'text-muted hover:text-fg'
+                      }`}
+                    >
+                      {label}
+                    </NavLink>
+                  </li>
+                )
+              })}
+            </ul>
+          </nav>
+
+          {/* Actions */}
+          <div className="flex items-center gap-1.5">
+            <LangSwitch lang={lang} setLang={setLang} className="hidden lg:flex" />
+            <button
+              type="button"
+              onClick={() => setDark(!dark)}
+              className="inline-flex h-9 w-9 items-center justify-center rounded-full text-muted transition-colors duration-300 hover:bg-fg/5 hover:text-fg"
+              aria-label={themeLabel}
+              title={themeLabel}
+            >
+              <Icon name={dark ? 'sun' : 'moon'} className="h-[18px] w-[18px]" />
+            </button>
             <a
               href={profile.contact.cv}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-sm font-semibold text-black dark:text-indigo-400 hover:text-slate-800 dark:hover:text-indigo-300 transition-colors"
+              className="btn-primary h-9 px-4 text-[13px]"
             >
+              <Icon name="file" className="h-4 w-4" />
               {nav.cv}
             </a>
-
-          {/* Lang avec drapeaux : desktop */}
-          <div className="relative hidden md:block" ref={langRef}>
             <button
               type="button"
-              onClick={() => setLangOpen((o) => !o)}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 text-sm font-bold text-black dark:text-slate-300 hover:text-black dark:hover:text-white border border-black dark:border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-1 dark:focus:ring-offset-slate-900 transition-colors"
-              aria-label={lang === 'fr' ? 'Français' : 'English'}
+              className="inline-flex h-9 w-9 items-center justify-center rounded-full text-fg transition-colors hover:bg-fg/5 lg:hidden"
+              onClick={() => setOpen((o) => !o)}
+              aria-label="Menu"
+              aria-expanded={open}
+              aria-controls="mobile-menu"
             >
-              {lang === 'fr' ? <FlagFR /> : <FlagGB />}
+              <Icon name={open ? 'close' : 'menu'} className="h-5 w-5" strokeWidth={1.75} />
             </button>
-            {langOpen && (
-              <div className="absolute right-0 top-full mt-1 py-1 min-w-[5rem] bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-md shadow-lg dark:shadow-xl">
-                <button
-                  type="button"
-                  onClick={() => { setLang('fr'); setLangOpen(false) }}
-                  className={`flex items-center gap-2 w-full text-left px-3 py-1.5 text-sm font-bold ${lang === 'fr' ? 'text-black dark:text-white bg-slate-100 dark:bg-indigo-600/20' : 'text-black dark:text-slate-300 hover:text-black dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-700/50'}`}
-                >
-                  <FlagFR />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => { setLang('en'); setLangOpen(false) }}
-                  className={`flex items-center gap-2 w-full text-left px-3 py-1.5 text-sm font-bold ${lang === 'en' ? 'text-black dark:text-white bg-slate-100 dark:bg-indigo-600/20' : 'text-black dark:text-slate-300 hover:text-black dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-700/50'}`}
-                >
-                  <FlagGB />
-                </button>
-              </div>
-            )}
           </div>
+        </div>
+      </header>
 
-          {/* Thème : icône soleil / lune */}
-          <button
-            type="button"
-            onClick={() => setDark(!dark)}
-            className="hidden md:flex p-1.5 rounded-md border border-black dark:border-slate-600 text-black dark:text-slate-300 hover:border-black hover:text-black dark:hover:border-indigo-400 dark:hover:text-white transition-colors"
-            aria-label={dark ? 'Mode clair' : 'Mode sombre'}
+      {/* Menu mobile plein écran */}
+      <div
+        id="mobile-menu"
+        className={`fixed inset-0 z-40 bg-bg/95 backdrop-blur-xl transition-[opacity,visibility] duration-500 lg:hidden ${
+          open ? 'visible opacity-100' : 'invisible opacity-0'
+        }`}
+      >
+        <div className="hero-grid pointer-events-none absolute inset-0 opacity-60" aria-hidden />
+        <nav
+          className="relative flex h-full flex-col justify-between overflow-y-auto px-6 pb-10 pt-28"
+          aria-label="Navigation"
+        >
+          <ul className="space-y-1">
+            {links.map(({ id, label }, i) => {
+              const active = activeSection === id
+              return (
+                <li
+                  key={id}
+                  className={`transition-all duration-500 ease-out ${open ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}
+                  style={{ transitionDelay: open ? `${80 + i * 45}ms` : '0ms' }}
+                >
+                  <NavLink
+                    isHome={isHome}
+                    id={id}
+                    onClick={() => setOpen(false)}
+                    aria-current={active ? 'true' : undefined}
+                    className="group flex items-baseline gap-4 py-2"
+                  >
+                    <span className="w-6 font-mono text-xs text-subtle">{String(i).padStart(2, '0')}</span>
+                    <span
+                      className={`font-display text-3xl font-semibold tracking-tight transition-colors sm:text-4xl ${
+                        active ? 'text-gradient' : 'text-fg group-hover:text-accent'
+                      }`}
+                    >
+                      {label}
+                    </span>
+                  </NavLink>
+                </li>
+              )
+            })}
+          </ul>
+
+          <div
+            className={`mt-10 flex flex-wrap items-center gap-3 border-t border-line pt-6 transition-all delay-300 duration-500 ${
+              open ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
+            }`}
           >
-            {dark ? (
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden><path strokeLinecap="round" strokeLinejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
-            ) : (
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden><path strokeLinecap="round" strokeLinejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
-            )}
-          </button>
-
-          </div>
-        </div>
-      </div>
-
-      {open && (
-        <div className="md:hidden border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 px-4 py-3 flex flex-col gap-1">
-          {links.map(({ to, label }) => {
-            const id = to.slice(1)
-            const active = activeSection === id
-            return (
-              <a
-                key={to}
-                href={to}
-                onClick={() => setOpen(false)}
-                className={`font-bold py-2 border-b border-slate-200 dark:border-slate-700/50 ${active ? 'text-black dark:text-white' : 'text-black dark:text-slate-300 hover:text-black dark:hover:text-white'}`}
-              >
-                {label}
-              </a>
-            )
-          })}
-          {/* Lang, Mode : dans le menu mobile */}
-          <div className="flex flex-col gap-2 pt-3 mt-2 border-t-2 border-slate-200 dark:border-slate-700">
-            <div className="relative" ref={langMobileRef}>
-              <button
-                type="button"
-                onClick={() => setLangMobileOpen((o) => !o)}
-                className="w-full flex items-center justify-between px-3 py-1.5 text-sm font-bold text-black dark:text-slate-300 hover:text-black dark:hover:text-white border border-black dark:border-slate-600 rounded-md bg-white dark:bg-slate-800/50"
-              >
-                <div className="flex items-center gap-2">
-                  {lang === 'fr' ? <FlagFR /> : <FlagGB />}
-                  <span className="text-xs text-slate-500 dark:text-slate-400">{lang === 'fr' ? 'Langue' : 'Language'}</span>
-                </div>
-                <span className="text-black dark:text-slate-400 text-xs">{langMobileOpen ? '▴' : '▾'}</span>
-              </button>
-              {langMobileOpen && (
-                <div className="absolute left-0 right-0 top-full mt-1 py-0.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-md shadow-lg dark:shadow-xl z-10">
-                  <button
-                    type="button"
-                    onClick={() => { setLang('fr'); setLangMobileOpen(false) }}
-                    className={`flex items-center justify-center gap-1.5 w-full px-2 py-1.5 text-sm ${lang === 'fr' ? 'text-black dark:text-white bg-slate-100 dark:bg-indigo-600/30' : 'text-black dark:text-slate-300 hover:text-black dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-700/50'}`}
-                  >
-                    <FlagFR />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => { setLang('en'); setLangMobileOpen(false) }}
-                    className={`flex items-center justify-center gap-1.5 w-full px-2 py-1.5 text-sm ${lang === 'en' ? 'text-black dark:text-white bg-slate-100 dark:bg-indigo-600/30' : 'text-black dark:text-slate-300 hover:text-black dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-700/50'}`}
-                  >
-                    <FlagGB />
-                  </button>
-                </div>
-              )}
-            </div>
-            <button
-              type="button"
-              onClick={() => { setDark(!dark) }}
-              className="flex items-center gap-2 font-bold py-2 text-black dark:text-slate-300 hover:text-black dark:hover:text-white w-fit"
-              aria-label={dark ? 'Mode clair' : 'Mode sombre'}
-            >
-              {dark ? (
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
-              ) : (
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
-              )}
-              {dark ? (lang === 'fr' ? 'Mode clair' : 'Light mode') : (lang === 'fr' ? 'Mode sombre' : 'Dark mode')}
+            <LangSwitch lang={lang} setLang={setLang} />
+            <button type="button" onClick={() => setDark(!dark)} className="btn-ghost h-10 px-4">
+              <Icon name={dark ? 'sun' : 'moon'} className="h-4 w-4" />
+              {themeLabel}
             </button>
+            <div className="ml-auto flex gap-2">
+              <a href={profile.contact.linkedin} target="_blank" rel="noopener noreferrer" className="icon-btn" aria-label="LinkedIn">
+                <Icon name="linkedin" className="h-4 w-4" />
+              </a>
+              <a href={profile.contact.github} target="_blank" rel="noopener noreferrer" className="icon-btn" aria-label="GitHub">
+                <Icon name="github" className="h-5 w-5" />
+              </a>
+            </div>
           </div>
-        </div>
-      )}
-    </header>
+        </nav>
+      </div>
+    </>
   )
 }

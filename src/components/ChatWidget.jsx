@@ -7,6 +7,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useLanguage } from '../context/LanguageContext'
 import profile from '../data/profile'
 import { AVATAR } from '../constants'
+import Icon from './Icon'
 
 // Minuscules + suppression des accents : « Compétences » → « competences ».
 // Sans ça, \b ne reconnaît pas les mots accentués (é n'est pas un caractère de mot en regex JS).
@@ -21,7 +22,7 @@ const PROJECT_KEYWORDS = [
 ]
 
 export default function ChatWidget() {
-  const { t } = useLanguage()
+  const { t, lang } = useLanguage()
   const [open, setOpen] = useState(false)
   const [input, setInput] = useState('')
   const [messages, setMessages] = useState([])
@@ -184,44 +185,61 @@ export default function ChatWidget() {
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="chat-btn-vibrate fixed bottom-6 right-6 z-50 w-14 h-14 rounded-2xl bg-black hover:bg-slate-800 text-white dark:bg-white dark:hover:bg-slate-100 dark:text-black dark:border-white/80 dark:shadow-slate-200/50 dark:focus:ring-offset-slate-900 border-2 border-black dark:border-white/80 shadow-xl flex items-center justify-center transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 focus:ring-offset-white"
+        className="fixed bottom-5 right-5 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-brand text-white shadow-[0_14px_36px_-12px_rgb(var(--g2)/0.9)] ring-1 ring-white/15 transition-transform duration-300 hover:-translate-y-0.5 focus-visible:outline-offset-4 sm:bottom-6 sm:right-6"
         aria-label="Chat"
+        aria-expanded={open}
+        aria-controls="chat-panel"
       >
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden>
-          <path d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z" />
-        </svg>
+        <Icon name={open ? 'close' : 'chat'} className="h-6 w-6" strokeWidth={1.75} />
       </button>
 
       {open && (
-        <div className="fixed bottom-24 right-6 z-50 w-[360px] max-w-[calc(100vw-3rem)] rounded-2xl border border-slate-600/80 dark:border-indigo-400/40 bg-slate-50 dark:bg-slate-900 shadow-2xl overflow-hidden flex flex-col chat-float">
+        <div
+          id="chat-panel"
+          role="dialog"
+          aria-label={profile.hero.name}
+          className="chat-float fixed inset-x-3 bottom-24 z-50 flex flex-col overflow-hidden rounded-3xl border border-line bg-surface/95 shadow-[0_30px_80px_-30px_rgb(0_0_0/0.6)] backdrop-blur-xl sm:inset-x-auto sm:right-6 sm:bottom-24 sm:w-[380px]"
+        >
           {/* En-tête avec ta photo */}
-          <div className="p-4 border-b border-slate-200 dark:border-slate-700 flex items-center gap-3 bg-white dark:bg-slate-800/80">
-            <img src={AVATAR} alt="" className="w-11 h-11 rounded-full object-cover ring-2 ring-indigo-400/50 shadow-md" />
-            <div className="flex-1 min-w-0">
-              <p className="font-semibold text-black dark:text-white truncate">{profile.hero.name}</p>
-              <p className="text-xs text-black dark:text-slate-400">{c.welcome || 'How can I help you?'}</p>
+          <div className="relative flex items-center gap-3 border-b border-line p-4">
+            <span className="absolute inset-x-0 top-0 h-px bg-brand opacity-70" aria-hidden />
+            <span className="relative shrink-0">
+              <img src={AVATAR} alt="" className="h-11 w-11 rounded-full object-cover ring-2 ring-accent/40" />
+              <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-surface bg-emerald-500" aria-hidden />
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="truncate font-display font-semibold text-fg">{profile.hero.name}</p>
+              <p className="truncate text-xs text-subtle">{c.welcome || 'How can I help you?'}</p>
             </div>
+            <button
+              type="button"
+              onClick={() => setOpen(false)}
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-muted transition-colors hover:bg-fg/5 hover:text-fg"
+              aria-label={lang === 'fr' ? 'Fermer' : 'Close'}
+            >
+              <Icon name="close" className="h-4 w-4" strokeWidth={2} />
+            </button>
           </div>
 
           {/* Zone des messages — discussion */}
-          <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-4 max-h-80">
+          <div ref={scrollRef} className="chat-scroll flex-1 space-y-4 overflow-y-auto p-4" aria-live="polite">
             {messages.length === 0 && (
               <div className="space-y-3">
                 {/* Premier message de bienvenue (toi) pour lancer la discussion */}
                 <div className="flex gap-2">
-                  <img src={AVATAR} alt="" className="w-8 h-8 rounded-full object-cover flex-shrink-0 ring-1 ring-slate-300 dark:ring-slate-600" />
-                  <p className="flex-1 px-3 py-2 rounded-2xl rounded-bl-md bg-slate-200 dark:bg-slate-700 text-black dark:text-slate-200 text-sm leading-relaxed">
+                  <img src={AVATAR} alt="" className="h-8 w-8 flex-shrink-0 rounded-full object-cover" />
+                  <p className="flex-1 rounded-2xl rounded-bl-md border border-line bg-bg px-3.5 py-2.5 text-sm leading-relaxed text-fg">
                     {c.welcome || 'Comment puis-je vous aider ?'}
                   </p>
                 </div>
-                <p className="text-xs text-slate-500 dark:text-slate-400">{c.askAnything || 'Posez une question ou choisissez un sujet.'}</p>
-                <div className="flex flex-wrap gap-2">
+                <p className="pl-10 text-xs leading-relaxed text-subtle">{c.askAnything || 'Posez une question ou choisissez un sujet.'}</p>
+                <div className="flex flex-wrap gap-2 pl-10">
                   {intents.map(({ key, label }) => (
                     <button
                       key={key}
                       type="button"
                       onClick={() => handleIntent(key)}
-                      className="px-3 py-1.5 text-sm rounded-full bg-slate-200 dark:bg-slate-700 text-black dark:text-slate-200 hover:bg-slate-300 dark:hover:bg-indigo-600/50 transition-colors"
+                      className="rounded-full border border-line bg-bg px-3 py-1.5 text-sm text-muted transition-colors hover:border-accent/50 hover:text-fg"
                     >
                       {label}
                     </button>
@@ -233,27 +251,27 @@ export default function ChatWidget() {
               <div key={i} className="space-y-1">
                 {msg.role === 'user' ? (
                   <div className="flex justify-end">
-                    <p className="max-w-[85%] px-3 py-2 rounded-2xl rounded-br-md bg-black text-white dark:bg-indigo-600 text-sm shadow-sm">
+                    <p className="max-w-[85%] rounded-2xl rounded-br-md px-3.5 py-2.5 text-sm text-white shadow-sm" style={{ backgroundImage: 'linear-gradient(120deg, #4f46e5, #7c3aed)' }}>
                       {msg.content}
                     </p>
                   </div>
                 ) : (
                   <>
                     <div className="flex gap-2">
-                      <img src={AVATAR} alt="" className="w-8 h-8 rounded-full object-cover flex-shrink-0 ring-1 ring-slate-300 dark:ring-slate-600" />
-                      <p className="flex-1 px-3 py-2 rounded-2xl rounded-bl-md bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 text-sm leading-relaxed">
+                      <img src={AVATAR} alt="" className="h-8 w-8 flex-shrink-0 rounded-full object-cover" />
+                      <p className="min-w-0 flex-1 break-words rounded-2xl rounded-bl-md border border-line bg-bg px-3.5 py-2.5 text-sm leading-relaxed text-fg">
                         {msg.content}
                       </p>
                     </div>
                     {/* Relances sous la dernière réponse */}
                     {i === messages.length - 1 && msg.topic && getFollowUps(msg.topic).length > 0 && (
-                      <div className="flex flex-wrap gap-1.5 pl-10 mt-1">
+                      <div className="mt-1 flex flex-wrap gap-1.5 pl-10">
                         {getFollowUps(msg.topic).map((s, j) => (
                           <button
                             key={j}
                             type="button"
                             onClick={() => handleFollowUp(s.query, s.label)}
-                            className="px-2.5 py-1 text-xs rounded-full bg-slate-100 dark:bg-slate-700/80 text-black dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-indigo-600/40 hover:text-black dark:hover:text-indigo-200 transition-colors"
+                            className="rounded-full border border-line px-2.5 py-1 text-xs text-muted transition-colors hover:border-accent/50 hover:text-fg"
                           >
                             {s.label}
                           </button>
@@ -266,18 +284,18 @@ export default function ChatWidget() {
             ))}
             {isTyping && (
               <div className="flex gap-2">
-                <img src={AVATAR} alt="" className="w-8 h-8 rounded-full object-cover flex-shrink-0 ring-1 ring-slate-300 dark:ring-slate-600" />
-                <div className="px-3 py-2 rounded-2xl rounded-bl-md bg-slate-200 dark:bg-slate-700 flex gap-1">
-                  <span className="w-2 h-2 rounded-full bg-black dark:bg-slate-400 animate-pulse" style={{ animationDelay: '0ms' }} />
-                  <span className="w-2 h-2 rounded-full bg-black dark:bg-slate-400 animate-pulse" style={{ animationDelay: '150ms' }} />
-                  <span className="w-2 h-2 rounded-full bg-black dark:bg-slate-400 animate-pulse" style={{ animationDelay: '300ms' }} />
+                <img src={AVATAR} alt="" className="h-8 w-8 flex-shrink-0 rounded-full object-cover" />
+                <div className="flex items-center gap-1 rounded-2xl rounded-bl-md border border-line bg-bg px-3.5 py-3">
+                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-subtle" style={{ animationDelay: '0ms' }} />
+                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-subtle" style={{ animationDelay: '150ms' }} />
+                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-subtle" style={{ animationDelay: '300ms' }} />
                 </div>
               </div>
             )}
           </div>
 
           {/* Saisie */}
-          <div className="p-3 border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/80 flex gap-2">
+          <div className="flex gap-2 border-t border-line p-3">
             <input
               type="text"
               value={input}
@@ -285,14 +303,16 @@ export default function ChatWidget() {
               onKeyDown={(e) => e.key === 'Enter' && handleSend()}
               placeholder={c.placeholder || 'Ask a question...'}
               aria-label={c.placeholder || 'Message'}
-              className="flex-1 px-3 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-800 dark:text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent"
+              className="min-w-0 flex-1 rounded-full border border-line bg-bg px-4 py-2.5 text-base text-fg placeholder:text-subtle transition-[border-color,box-shadow] focus:border-accent focus:outline-none focus:ring-4 focus:ring-accent/15 sm:text-sm"
             />
             <button
               type="button"
               onClick={handleSend}
-              className="px-4 py-2.5 rounded-xl bg-black hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-black text-sm font-medium transition-colors"
+              className="btn-primary h-11 w-11 shrink-0 px-0"
+              aria-label={c.send || 'Send'}
+              title={c.send || 'Send'}
             >
-              {c.send || 'Send'}
+              <Icon name="send" className="h-4 w-4" strokeWidth={1.75} />
             </button>
           </div>
         </div>
